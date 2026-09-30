@@ -155,6 +155,10 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-xs text-orange-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
+            <span>Cloudflare Pages</span>
+          </div>
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-xs text-slate-300">
             <Database className="w-3.5 h-3.5 text-emerald-400" />
             <span className="text-slate-400">Supabase:</span>
@@ -190,8 +194,14 @@ export default function App() {
 
             <div className="relative bg-slate-900/90 backdrop-blur-xl border border-slate-800/90 rounded-2xl p-6 sm:p-8 shadow-2xl">
               <div className="text-center mb-8">
-                <div className="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-rose-500/10 to-amber-500/10 border border-rose-500/20 mb-4 text-rose-400">
-                  <ShieldCheck className="w-8 h-8" />
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>Cloudflare Edge • Auto-Deploy Active</span>
+                </div>
+                <div>
+                  <div className="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-rose-500/10 to-amber-500/10 border border-rose-500/20 mb-4 text-rose-400">
+                    <ShieldCheck className="w-8 h-8" />
+                  </div>
                 </div>
                 <h2 className="text-2xl font-bold text-white tracking-tight">
                   Welcome to Coral AI
@@ -250,6 +260,12 @@ export default function App() {
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500">Provider</span>
                   <span className="font-medium text-slate-300">Google OAuth 2.0</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Hosting</span>
+                  <span className="inline-flex items-center gap-1.5 font-medium text-orange-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span> Cloudflare Pages
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-500">Supabase Project</span>
