@@ -1,17 +1,674 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="https://supabase.com/favicon/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Coral_AI • By Coral_Cloud</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Press+Start+2P&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-  </head>
-  <body class="bg-[#080511] text-slate-100 font-sans antialiased min-h-screen">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<!DOCTYPE html><html lang="en" style=""><head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Sign in — Coral_AI</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Press+Start+2P&amp;family=Silkscreen:wght@400;700&amp;family=VT323&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+            inter: ['Inter', 'sans-serif'],
+            pixel: ['"Press Start 2P"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              dark: '#080511',
+              card: 'rgba(21, 13, 37, 0.65)',
+              border: 'rgba(168, 85, 247, 0.16)',
+              borderHover: 'rgba(192, 132, 252, 0.45)',
+              accent: '#9333ea',
+              accentLight: '#c084fc',
+              glow: '#7c3aed',
+            }
+          },
+          boxShadow: {
+            'glow-subtle': '0 0 60px -15px rgba(147, 51, 234, 0.35)',
+            'glass': '0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+            'retro-btn': '0 5px 0 #334155, 0 10px 20px rgba(0,0,0,0.6)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes diagonalScroll {
+      0% { background-position: 0 0; }
+      100% { background-position: 908px 406px; }
+    }
+
+    .animated-coral-bg {
+      background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCEA43Mr2bEvkaEUndqWysWgbhI3hOhxs76mOAKHPDjsPKewbVAITYTNI2kq1vgB7TyrIqcRSZgDuIK8qPHSBkdbb40seorjei3rniQjWAWuqfh_0m31mEVO5sF348lt3G1cjxrUguXhJzRswg0MhvWfVuVetdAPXuNnS0D30ZX-H6eCVLavuTG2X6o2QxRtkBDVEIiBsDPeJT0bywDLgGTo0DZzZ_XZ8pIaYcDQqR50_YyRwxAfhYLXnrw0qSFk1HFuA');
+      background-repeat: repeat;
+      background-size: 908px 406px;
+      animation: diagonalScroll 35s linear infinite;
+      will-change: background-position;
+    }
+
+    @keyframes scanlineDrift {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 24px; }
+    }
+
+    @keyframes phosphorGlow {
+      0%, 100% {
+        box-shadow: 0 5px 0 #1e1338, 0 0 15px rgba(168, 85, 247, 0.45), 0 0 30px rgba(99, 102, 241, 0.25);
+      }
+      50% {
+        box-shadow: 0 5px 0 #1e1338, 0 0 24px rgba(217, 70, 239, 0.7), 0 0 42px rgba(56, 189, 248, 0.4);
+      }
+    }
+
+    @keyframes auraPulse {
+      0%, 100% {
+        opacity: 0.4;
+        filter: blur(8px);
+        transform: scale(0.99);
+      }
+      50% {
+        opacity: 0.85;
+        filter: blur(14px);
+        transform: scale(1.02);
+      }
+    }
+
+    @keyframes pixelSheen {
+      0% { transform: translateX(-150%) skewX(-15deg); }
+      35%, 100% { transform: translateX(250%) skewX(-15deg); }
+    }
+
+    .retro-google-btn {
+      background-color: #ffffff;
+      background-image: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.98),
+        rgba(255, 255, 255, 0.98) 2px,
+        rgba(226, 232, 240, 0.85) 2px,
+        rgba(226, 232, 240, 0.85) 4px
+      );
+      background-size: 100% 4px;
+      animation: scanlineDrift 2.2s linear infinite, phosphorGlow 4s ease-in-out infinite;
+      image-rendering: pixelated;
+      transition: transform 0.12s steps(2, start), filter 0.15s ease, background-color 0.15s ease;
+    }
+
+    .retro-google-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.06) contrast(1.02);
+      box-shadow: 0 7px 0 #3b0764, 0 0 30px rgba(192, 132, 252, 0.8), 0 0 50px rgba(56, 189, 248, 0.5) !important;
+    }
+
+    .retro-google-btn:active {
+      transform: translateY(3px) !important;
+      box-shadow: 0 2px 0 #1e1338, 0 0 12px rgba(168, 85, 247, 0.5) !important;
+    }
+
+    .retro-aura {
+      animation: auraPulse 3.5s ease-in-out infinite;
+    }
+
+    .pixel-shimmer-beam {
+      animation: pixelSheen 4.5s ease-in-out infinite;
+    }
+
+    .glass-card {
+      background: linear-gradient(135deg, rgba(20, 11, 38, 0.78) 0%, rgba(9, 5, 18, 0.88) 100%);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(168, 85, 247, 0.24);
+    }
+
+    @keyframes retroPixelHop {
+      0% { transform: translate(0, 0); box-shadow: 0 4px 0 #cbd5e1, 0 10px 25px rgba(168, 85, 247, 0.25); }
+      33% { transform: translate(-2px, -3px); box-shadow: 2px 5px 0 #c084fc, 0 12px 28px rgba(168, 85, 247, 0.4); }
+      66% { transform: translate(2px, -2px); box-shadow: -2px 4px 0 #f472b6, 0 10px 25px rgba(232, 121, 249, 0.35); }
+      100% { transform: translate(0, -3px); box-shadow: 0 5px 0 #9333ea, 0 14px 30px rgba(168, 85, 247, 0.5); }
+    }
+
+    @keyframes pixelArrowNudge {
+      0% { transform: translateX(0); }
+      30% { transform: translateX(3px); }
+      60% { transform: translateX(1px); }
+      100% { transform: translateX(5px); }
+    }
+
+    .btn-pixel-submit {
+      transition: all 0.12s steps(2, start);
+    }
+
+    .btn-pixel-submit:hover {
+      animation: retroPixelHop 0.22s steps(3, end) forwards;
+      background-color: #ffffff;
+      color: #080511;
+    }
+
+    .btn-pixel-submit:hover .pixel-arrow {
+      animation: pixelArrowNudge 0.3s steps(3, end) infinite alternate;
+    }
+
+    .btn-pixel-submit:active {
+      transform: translate(0, 2px) !important;
+      box-shadow: 0 1px 0 #7c3aed !important;
+    }
+
+    .physics-panel {
+      background: radial-gradient(circle at 50% 30%, rgba(30, 16, 56, 0.6) 0%, rgba(12, 6, 26, 0.85) 100%);
+      border: 1px solid rgba(168, 85, 247, 0.22);
+      box-shadow: inset 0 0 40px rgba(147, 51, 234, 0.15), 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+
+    .arcade-grid-overlay {
+      background-image: linear-gradient(to right, rgba(168, 85, 247, 0.08) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(168, 85, 247, 0.08) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+  </style>
+</head>
+<body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col justify-between font-sans selection:bg-purple-600 selection:text-white relative overflow-x-hidden antialiased">
+  <!-- Animated Dynamic Background Layer with Coral_AI Pattern -->
+  <div class="fixed inset-0 pointer-events-none -z-20 overflow-hidden bg-brand-dark">
+    <div class="animated-coral-bg absolute inset-0 w-full h-full opacity-35 mix-blend-screen scale-105"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#080511]/85 via-[#080511]/60 to-[#080511]/90"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,#080511_85%)]"></div>
+  </div>
+  <!-- Ambient glow lighting -->
+  <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+    <div class="absolute -top-32 left-1/4 w-[650px] h-[650px] bg-purple-900/30 rounded-full blur-[140px]"></div>
+    <div class="absolute top-1/3 right-1/4 w-[750px] h-[750px] bg-fuchsia-950/40 rounded-full blur-[160px]"></div>
+    <div class="absolute -bottom-40 left-1/3 w-[600px] h-[600px] bg-indigo-950/30 rounded-full blur-[150px]"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="w-full max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between z-30" data-purpose="modern-header">
+    <a class="flex items-center space-x-3 group" href="#">
+      <span class="text-lg font-pixel tracking-wider text-white group-hover:text-purple-300 transition-colors uppercase">Coral_AI</span>
+    </a>
+    <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+      <a class="hover:text-white transition-colors duration-200" href="#about">About</a>
+      <a class="hover:text-white transition-colors duration-200" href="#home">Home</a>
+      <a class="hover:text-white transition-colors duration-200" href="#contacts">Contacts</a>
+      <a class="hover:text-white transition-colors duration-200" href="#support">Support</a>
+    </nav>
+    <div class="flex items-center space-x-4">
+      <a class="text-sm font-medium text-purple-300 hover:text-white transition-colors hidden sm:inline-block" href="#signin">Help Center</a>
+    </div>
+  </header>
+
+  <!-- Main Viewport Split Container: Login on Left, Interactive Physics on Right -->
+  <main class="flex-grow flex items-center justify-center px-6 lg:px-12 py-4 max-w-7xl mx-auto w-full relative z-20">
+    <div class="flex items-center justify-center w-full">
+      <!-- LEFT COLUMN: Login Card -->
+      <section class="flex flex-col justify-center w-full mx-auto" data-purpose="auth-terminal" style="max-width: 530px;">
+        <div class="glass-card rounded-3xl p-8 md:p-10 shadow-glass relative overflow-hidden" style="padding: 2.75rem 2.5rem;">
+          <div class="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-purple-400/50 to-transparent"></div>
+          
+          <div class="mb-7">
+            <h1 class="text-xl md:text-2xl font-pixel text-white tracking-wider uppercase leading-snug">
+              Sign up account
+            </h1>
+            <p class="text-xs text-purple-300/80 mt-3 font-mono leading-relaxed tracking-wider uppercase" style="font-family: Silkscreen, &quot;Press Start 2P&quot;, monospace;">
+              Enter your personal data to continue your account session
+            </p>
+          </div>
+
+          <!-- 16-Bit Retro Google Auth Button -->
+          <div class="mb-7" data-purpose="retro-google-anchor">
+            <div class="relative group">
+              <div class="retro-aura absolute -inset-1 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 rounded-sm pointer-events-none opacity-40"></div>
+              <button class="retro-google-btn relative w-full border-4 border-white p-3.5 flex items-center justify-center space-x-3 cursor-pointer overflow-hidden select-none" type="button" style="padding: 1rem 1.25rem;">
+                <div class="pixel-shimmer-beam absolute inset-y-0 w-16 bg-gradient-to-r from-transparent via-white/70 to-transparent pointer-events-none"></div>
+                <svg class="w-6 h-6 shrink-0 relative z-10" fill="none" style="image-rendering: pixelated;" viewBox="0 0 24 24">
+                  <rect fill="#EA4335" height="3" width="14" x="5" y="4"></rect>
+                  <rect fill="#EA4335" height="10" width="3" x="3" y="6"></rect>
+                  <rect fill="#FBBC05" height="6" width="3" x="3" y="12"></rect>
+                  <rect fill="#34A853" height="3" width="14" x="5" y="17"></rect>
+                  <rect fill="#34A853" height="3" width="4" x="15" y="15"></rect>
+                  <rect fill="#4285F4" height="3" width="10" x="10" y="11"></rect>
+                  <rect fill="#4285F4" height="7" width="3" x="17" y="11"></rect>
+                </svg>
+                <span class="text-black font-pixel text-xs tracking-wider font-bold relative z-10">
+                  SIGN IN WITH GOOGLE
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="relative flex items-center justify-center mb-6">
+            <div class="border-t border-purple-500/20 w-full"></div>
+            <span class="bg-[#120824] px-4 text-xs font-inter text-slate-400 uppercase tracking-widest absolute">
+              or email
+            </span>
+          </div>
+
+          <!-- Form Fields -->
+          <form class="space-y-4" data-purpose="credential-form" onsubmit="event.preventDefault();">
+            <div>
+              <label class="block text-xs font-mono text-purple-300 mb-1.5 ml-1 uppercase tracking-wider" for="username" style="font-family: 'Silkscreen', monospace;">Email or Username</label>
+              <div class="relative">
+                <input autocomplete="off" class="w-full bg-purple-950/30 border border-purple-500/25 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono tracking-wider" id="username" placeholder="Enter your email or username" style="font-family: VT323, monospace; font-size: 18px; padding-top: 0.9rem; padding-bottom: 0.9rem;" type="text">
+                <span class="material-symbols-outlined absolute right-3.5 top-3 text-slate-400 text-lg" style="top: 14px;">mail</span>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between items-center mb-1.5 ml-1">
+                <label class="text-xs font-mono text-purple-300 uppercase tracking-wider" for="password" style="font-family: 'Silkscreen', monospace;">Password</label>
+                <a class="text-xs font-mono text-purple-400 hover:text-purple-300 transition-colors uppercase tracking-wider" href="#forgot" style="font-family: 'Silkscreen', monospace; font-size: 10px;">Forgot password?</a>
+              </div>
+              <div class="relative">
+                <input autocomplete="current-password" class="w-full bg-purple-950/30 border border-purple-500/25 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono tracking-widest" id="password" style="font-family: VT323, monospace; font-size: 19px; padding-top: 0.9rem; padding-bottom: 0.9rem;" type="password" placeholder="Enter your password">
+                <span class="material-symbols-outlined absolute right-3.5 top-3 text-slate-400 text-lg" style="top: 14px;">lock</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+              <label class="flex items-center space-x-2.5 cursor-pointer select-none">
+                <input checked="" class="w-4 h-4 rounded-md bg-purple-950/50 border-purple-500/40 text-purple-600 focus:ring-purple-500/30 focus:ring-offset-0 focus:ring-1" type="checkbox">
+                <span class="text-xs text-slate-300 font-mono tracking-wider uppercase" style="font-family: 'Silkscreen', monospace; font-size: 10px;">Remember this device</span>
+              </label>
+              <span class="text-xs text-purple-400 font-mono tracking-widest uppercase" style="font-family: 'Press Start 2P', monospace; font-size: 9px;">SSL Secure</span>
+            </div>
+            <div class="pt-2 space-y-3">
+              <button class="btn-pixel-submit group w-full bg-white hover:bg-slate-50 text-slate-900 font-semibold py-3.5 px-4 rounded-xl shadow-lg shadow-white/10 hover:shadow-purple-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer" type="submit" style="padding-top: 1rem; padding-bottom: 1rem;">
+                <span class="font-pixel text-xs tracking-wider inline-flex items-center leading-none">Sign In</span>
+                <span class="material-symbols-outlined pixel-arrow text-base font-bold leading-none inline-flex items-center select-none">arrow_forward</span>
+              </button>
+              <div class="text-center pt-2">
+                <p class="text-xs text-slate-400 font-inter">
+                  Already have an account? 
+                  <a class="text-purple-300 hover:text-white font-medium ml-1 underline decoration-purple-500/50 underline-offset-4" href="#login">Log in</a>
+                </p>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Interactive Physics Sandbox for 'Coral_AI!' -->
+      
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-7xl mx-auto px-6 lg:px-12 py-6 border-t border-purple-500/10 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-4 z-20" data-purpose="modern-footer">
+    <div class="flex items-center space-x-6 text-slate-400">
+      <a class="hover:text-purple-300 transition-colors" href="#privacy">Privacy Policy</a>
+      <a class="hover:text-purple-300 transition-colors" href="#terms">Terms of Service</a>
+      <a class="hover:text-purple-300 transition-colors" href="#security">Security</a>
+    </div>
+  </footer>
+
+  <!-- Physics Engine and Interaction Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('physics-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      const letters = ['C', 'o', 'r', 'a', 'l', '_', 'A', 'I', '!'];
+      const blockColors = [
+        { top: '#7928ca', bot: '#4c1d95', border: '#c084fc', glow: '#a855f7', text: '#ffffff' },
+        { top: '#db2777', bot: '#831843', border: '#f472b6', glow: '#ec4899', text: '#ffffff' },
+        { top: '#2563eb', bot: '#1e3a8a', border: '#60a5fa', glow: '#3b82f6', text: '#ffffff' },
+        { top: '#9333ea', bot: '#581c87', border: '#d8b4fe', glow: '#a855f7', text: '#ffffff' },
+        { top: '#0891b2', bot: '#164e63', border: '#67e8f9', glow: '#06b6d4', text: '#ffffff' },
+        { top: '#475569', bot: '#1e293b', border: '#94a3b8', glow: '#cbd5e1', text: '#38bdf8' },
+        { top: '#d946ef', bot: '#701a75', border: '#f0abfc', glow: '#e879f9', text: '#ffffff' },
+        { top: '#6366f1', bot: '#312e81', border: '#a5b4fc', glow: '#818cf8', text: '#ffffff' },
+        { top: '#f43f5e', bot: '#881337', border: '#fda4af', glow: '#fb7185', text: '#ffffff' }
+      ];
+
+      let width = 0;
+      let height = 0;
+      let dpr = window.devicePixelRatio || 1;
+
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        width = rect.width;
+        height = rect.height;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function roundRect(c, x, y, w, h, r) {
+        if (typeof r === 'number') r = [r, r, r, r];
+        c.beginPath();
+        c.moveTo(x + r[0], y);
+        c.lineTo(x + w - r[1], y);
+        c.quadraticCurveTo(x + w, y, x + w, y + r[1]);
+        c.lineTo(x + w, y + h - r[2]);
+        c.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h);
+        c.lineTo(x + r[3], y + h);
+        c.quadraticCurveTo(x, y + h, x, y + h - r[3]);
+        c.lineTo(x, y + r[0]);
+        c.quadraticCurveTo(x, y, x + r[0], y);
+        c.closePath();
+      }
+
+      class PhysicsBody {
+        constructor(char, color, x, y, size) {
+          this.char = char;
+          this.color = color;
+          this.x = x;
+          this.y = y;
+          this.size = size;
+          this.half = size / 2;
+          this.vx = (Math.random() - 0.5) * 6;
+          this.vy = -Math.random() * 5 - 2;
+          this.angle = (Math.random() - 0.5) * 0.4;
+          this.va = (Math.random() - 0.5) * 0.08;
+          this.mass = 1;
+          this.restitution = 0.65;
+          this.friction = 0.985;
+          this.isHeld = false;
+          this.grabOffsetX = 0;
+          this.grabOffsetY = 0;
+        }
+
+        update(gravity, bounds) {
+          if (this.isHeld) return;
+
+          this.vy += gravity;
+          this.x += this.vx;
+          this.y += this.vy;
+          this.angle += this.va;
+
+          this.vx *= this.friction;
+          this.vy *= 0.995;
+          this.va *= 0.97;
+
+          // Floor
+          if (this.y + this.half > bounds.height) {
+            this.y = bounds.height - this.half;
+            this.vy = -this.vy * this.restitution;
+            this.vx *= 0.88;
+            this.va *= 0.85;
+            if (Math.abs(this.vy) < 0.2) this.vy = 0;
+          }
+          // Ceiling
+          if (this.y - this.half < 0) {
+            this.y = this.half;
+            this.vy = -this.vy * this.restitution;
+          }
+          // Left wall
+          if (this.x - this.half < 0) {
+            this.x = this.half;
+            this.vx = -this.vx * this.restitution;
+            this.va += this.vy * 0.01;
+          }
+          // Right wall
+          if (this.x + this.half > bounds.width) {
+            this.x = bounds.width - this.half;
+            this.vx = -this.vx * this.restitution;
+            this.va -= this.vy * 0.01;
+          }
+        }
+
+        draw(c) {
+          c.save();
+          c.translate(this.x, this.y);
+          c.rotate(this.angle);
+
+          const h = this.half;
+          const w = this.size;
+          const r = 10;
+
+          const speed = Math.hypot(this.vx, this.vy);
+          const glowAmount = this.isHeld ? 26 : Math.min(22, 6 + speed * 1.5);
+          c.shadowColor = this.color.glow;
+          c.shadowBlur = glowAmount;
+
+          // Shadow base
+          c.fillStyle = '#05030a';
+          roundRect(c, -h + 4, -h + 4, w, w, r);
+          c.fill();
+
+          // Gradient letter block
+          const grad = c.createLinearGradient(0, -h, 0, h);
+          grad.addColorStop(0, this.color.top);
+          grad.addColorStop(1, this.color.bot);
+          c.fillStyle = grad;
+          roundRect(c, -h, -h, w, w, r);
+          c.fill();
+
+          // Border
+          c.shadowBlur = 0;
+          c.lineWidth = this.isHeld ? 3.5 : 2;
+          c.strokeStyle = this.isHeld ? '#ffffff' : this.color.border;
+          roundRect(c, -h, -h, w, w, r);
+          c.stroke();
+
+          // Top highlight
+          c.fillStyle = 'rgba(255, 255, 255, 0.22)';
+          roundRect(c, -h + 3, -h + 3, w - 6, 8, [6, 6, 2, 2]);
+          c.fill();
+
+          // Scanlines
+          c.fillStyle = 'rgba(0, 0, 0, 0.2)';
+          for (let y = -h + 4; y < h - 4; y += 4) {
+            c.fillRect(-h + 3, y, w - 6, 1.5);
+          }
+
+          // Letter character
+          c.shadowColor = '#000000';
+          c.shadowBlur = 4;
+          c.shadowOffsetX = 2;
+          c.shadowOffsetY = 2;
+          c.fillStyle = this.color.text;
+          c.font = `bold ${Math.round(this.size * 0.44)}px "Press Start 2P", monospace`;
+          c.textAlign = 'center';
+          c.textBaseline = 'middle';
+          c.fillText(this.char, 0, 2);
+
+          // Arcade chassis bolts
+          c.shadowBlur = 0;
+          c.fillStyle = 'rgba(255, 255, 255, 0.6)';
+          c.fillRect(-h + 5, -h + 5, 2.5, 2.5);
+          c.fillRect(h - 7.5, -h + 5, 2.5, 2.5);
+          c.fillRect(-h + 5, h - 7.5, 2.5, 2.5);
+          c.fillRect(h - 7.5, h - 7.5, 2.5, 2.5);
+
+          c.restore();
+        }
+
+        containsPoint(px, py) {
+          const dx = px - this.x;
+          const dy = py - this.y;
+          const cos = Math.cos(-this.angle);
+          const sin = Math.sin(-this.angle);
+          const localX = cos * dx - sin * dy;
+          const localY = sin * dx + cos * dy;
+          return Math.abs(localX) <= this.half && Math.abs(localY) <= this.half;
+        }
+      }
+
+      let bodies = [];
+
+      function spawnBodies() {
+        bodies = [];
+        const isSmall = width < 600;
+        const blockSize = isSmall ? 52 : Math.min(74, Math.floor(width / 11));
+        const spacing = blockSize + 8;
+        const totalWidth = letters.length * spacing;
+        const startX = Math.max(blockSize, (width - totalWidth) / 2 + blockSize / 2);
+        const startY = 80;
+
+        letters.forEach((char, i) => {
+          const x = startX + i * spacing + (Math.random() - 0.5) * 12;
+          const y = startY + (i % 2 === 0 ? -25 : 25) + Math.random() * 20;
+          const b = new PhysicsBody(char, blockColors[i % blockColors.length], x, y, blockSize);
+          bodies.push(b);
+        });
+      }
+
+      // Mutual Block Collisions
+      function resolveCollisions() {
+        for (let i = 0; i < bodies.length; i++) {
+          for (let j = i + 1; j < bodies.length; j++) {
+            const b1 = bodies[i];
+            const b2 = bodies[j];
+            const dx = b2.x - b1.x;
+            const dy = b2.y - b1.y;
+            const dist = Math.hypot(dx, dy);
+            const minDist = (b1.size + b2.size) * 0.48;
+
+            if (dist < minDist && dist > 0.001) {
+              const nx = dx / dist;
+              const ny = dy / dist;
+              const overlap = minDist - dist;
+
+              if (!b1.isHeld && !b2.isHeld) {
+                b1.x -= nx * overlap * 0.5;
+                b1.y -= ny * overlap * 0.5;
+                b2.x += nx * overlap * 0.5;
+                b2.y += ny * overlap * 0.5;
+              } else if (b1.isHeld) {
+                b2.x += nx * overlap;
+                b2.y += ny * overlap;
+              } else if (b2.isHeld) {
+                b1.x -= nx * overlap;
+                b1.y -= ny * overlap;
+              }
+
+              // Elastic response
+              const kx = b1.vx - b2.vx;
+              const ky = b1.vy - b2.vy;
+              const p = 2 * (nx * kx + ny * ky) / (b1.mass + b2.mass);
+
+              if (p > 0) {
+                if (!b1.isHeld) {
+                  b1.vx -= p * b2.mass * nx * 0.8;
+                  b1.vy -= p * b2.mass * ny * 0.8;
+                  b1.va += (Math.random() - 0.5) * 0.04;
+                }
+                if (!b2.isHeld) {
+                  b2.vx += p * b1.mass * nx * 0.8;
+                  b2.vy += p * b1.mass * ny * 0.8;
+                  b2.va += (Math.random() - 0.5) * 0.04;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Mouse & Drag State
+      let draggedBody = null;
+      let prevMouseX = 0;
+      let prevMouseY = 0;
+      let mouseVelX = 0;
+      let mouseVelY = 0;
+
+      function getCanvasPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: clientX - rect.left,
+          y: clientY - rect.top
+        };
+      }
+
+      function onDown(e) {
+        const pos = getCanvasPos(e);
+        prevMouseX = pos.x;
+        prevMouseY = pos.y;
+        mouseVelX = 0;
+        mouseVelY = 0;
+
+        for (let i = bodies.length - 1; i >= 0; i--) {
+          const b = bodies[i];
+          if (b.containsPoint(pos.x, pos.y)) {
+            draggedBody = b;
+            b.isHeld = true;
+            b.grabOffsetX = pos.x - b.x;
+            b.grabOffsetY = pos.y - b.y;
+            b.vx = 0;
+            b.vy = 0;
+            // Bring to top
+            bodies.splice(i, 1);
+            bodies.push(b);
+            break;
+          }
+        }
+      }
+
+      function onMove(e) {
+        const pos = getCanvasPos(e);
+        mouseVelX = pos.x - prevMouseX;
+        mouseVelY = pos.y - prevMouseY;
+        prevMouseX = pos.x;
+        prevMouseY = pos.y;
+
+        if (draggedBody) {
+          draggedBody.x = pos.x - draggedBody.grabOffsetX;
+          draggedBody.y = pos.y - draggedBody.grabOffsetY;
+          draggedBody.vx = mouseVelX * 0.8;
+          draggedBody.vy = mouseVelY * 0.8;
+          draggedBody.va = mouseVelX * 0.015;
+        }
+      }
+
+      function onUp() {
+        if (draggedBody) {
+          draggedBody.isHeld = false;
+          draggedBody.vx = Math.max(-25, Math.min(25, mouseVelX * 1.25));
+          draggedBody.vy = Math.max(-25, Math.min(25, mouseVelY * 1.25));
+          draggedBody = null;
+        }
+      }
+
+      canvas.addEventListener('mousedown', onDown);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+
+      canvas.addEventListener('touchstart', onDown, { passive: true });
+      window.addEventListener('touchmove', onMove, { passive: true });
+      window.addEventListener('touchend', onUp);
+
+      // Explosive force button
+      document.getElementById('btn-explode')?.addEventListener('click', () => {
+        bodies.forEach(b => {
+          b.vx += (Math.random() - 0.5) * 35;
+          b.vy = -Math.random() * 22 - 8;
+          b.va += (Math.random() - 0.5) * 0.25;
+        });
+      });
+
+      // Reset positions button
+      document.getElementById('btn-reset')?.addEventListener('click', () => {
+        spawnBodies();
+      });
+
+      // Spawn on load
+      spawnBodies();
+
+      // Main Physics Simulation Loop
+      const gravity = 0.42;
+      function loop() {
+        ctx.clearRect(0, 0, width, height);
+
+        const bounds = { width, height };
+        bodies.forEach(b => b.update(gravity, bounds));
+        resolveCollisions();
+        bodies.forEach(b => b.draw(ctx));
+
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    });
+  </script>
+
+
+
+
+
+  <script type="module" src="/src/main.ts"></script>
+</body></html>
