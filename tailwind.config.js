@@ -7,36 +7,29 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['"Space Grotesk"', 'sans-serif'],
-        sub: ['"JetBrains Mono"', 'monospace'],
-        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+        pixel: ['"Press Start 2P"', 'monospace'],
+        silkscreen: ['"Silkscreen"', 'monospace'],
+        vt323: ['"VT323"', 'monospace'],
+        display: ['"Press Start 2P"', 'monospace'],
+        sub: ['"Silkscreen"', 'monospace'],
       },
-      animation: {
-        'aurora-1': 'auroraOne 14s ease-in-out infinite alternate',
-        'aurora-2': 'auroraTwo 18s ease-in-out infinite alternate',
-        'aurora-3': 'auroraThree 20s ease-in-out infinite alternate',
-        'pulse-subtle': 'pulseSubtle 6s ease-in-out infinite',
+      colors: {
+        brand: {
+          dark: '#080511',
+          card: 'rgba(21, 13, 37, 0.65)',
+          border: 'rgba(168, 85, 247, 0.16)',
+          borderHover: 'rgba(192, 132, 252, 0.45)',
+          accent: '#9333ea',
+          accentLight: '#c084fc',
+          glow: '#7c3aed',
+        },
       },
-      keyframes: {
-        auroraOne: {
-          '0%': { transform: 'translate(0px, 0px) scale(1)' },
-          '50%': { transform: 'translate(60px, -40px) scale(1.15)' },
-          '100%': { transform: 'translate(-30px, 50px) scale(0.95)' },
-        },
-        auroraTwo: {
-          '0%': { transform: 'translate(0px, 0px) scale(1)' },
-          '50%': { transform: 'translate(-70px, 60px) scale(1.2)' },
-          '100%': { transform: 'translate(40px, -30px) scale(0.9)' },
-        },
-        auroraThree: {
-          '0%': { transform: 'translate(0px, 0px) scale(0.9)' },
-          '50%': { transform: 'translate(40px, 50px) scale(1.1)' },
-          '100%': { transform: 'translate(-50px, -30px) scale(1.05)' },
-        },
-        pulseSubtle: {
-          '0%, 100%': { opacity: '0.45' },
-          '50%': { opacity: '0.75' },
-        },
+      boxShadow: {
+        'glow-subtle': '0 0 60px -15px rgba(147, 51, 234, 0.35)',
+        'glass': '0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+        'retro-btn': '0 5px 0 #334155, 0 10px 20px rgba(0,0,0,0.6)',
       },
     },
   },
