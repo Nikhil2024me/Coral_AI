@@ -126,3 +126,139 @@ body {
   transform: translate(0, 2px) !important;
   box-shadow: 0 1px 0 #7c3aed !important;
 }
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #080511;
+}
+::-webkit-scrollbar-thumb {
+  background: #2e1065;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6b21a8;
+}
+
+/* Markdown prose styling for Coral_AI */
+.coral-prose {
+  color: #e2e8f0;
+  font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  word-break: break-word;
+}
+.coral-prose p {
+  margin-bottom: 0.85rem;
+}
+.coral-prose p:last-child {
+  margin-bottom: 0;
+}
+.coral-prose h1, .coral-prose h2, .coral-prose h3, .coral-prose h4 {
+  font-family: 'Silkscreen', monospace;
+  color: #f8fafc;
+  margin-top: 1.25rem;
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.05em;
+}
+.coral-prose h1 { font-size: 1.15rem; color: #c084fc; }
+.coral-prose h2 { font-size: 1.05rem; color: #d8b4fe; }
+.coral-prose h3 { font-size: 0.95rem; color: #e9d5ff; }
+
+.coral-prose ul {
+  list-style-type: square;
+  padding-left: 1.25rem;
+  margin-bottom: 0.85rem;
+}
+.coral-prose ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin-bottom: 0.85rem;
+}
+.coral-prose li {
+  margin-bottom: 0.3rem;
+}
+
+.coral-prose a {
+  color: #c084fc;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.coral-prose a:hover {
+  color: #e9d5ff;
+}
+
+.coral-prose strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.coral-prose blockquote {
+  border-left: 3px solid #9333ea;
+  background: rgba(147, 51, 234, 0.08);
+  padding: 0.5rem 1rem;
+  margin: 0.75rem 0;
+  color: #cbd5e1;
+  font-style: italic;
+}
+
+.coral-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+}
+.coral-prose th, .coral-prose td {
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+.coral-prose th {
+  background: rgba(30, 15, 55, 0.7);
+  color: #c084fc;
+  font-family: 'Silkscreen', monospace;
+}
+
+.coral-prose code:not(pre code) {
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  background: rgba(46, 16, 101, 0.5);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  color: #f0abfc;
+}
+
+.coral-code-box {
+  background: #090414;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 8px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.coral-code-header {
+  background: rgba(22, 11, 40, 0.9);
+  border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.85rem;
+  font-family: 'Silkscreen', monospace;
+  font-size: 0.75rem;
+  color: #c084fc;
+}
+
+.coral-code-box pre {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+}
+
