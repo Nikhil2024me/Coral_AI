@@ -262,3 +262,31 @@ body {
   color: #e2e8f0;
 }
 
+/* Qwen-Style Retro Ergonomics */
+.qwen-capsule {
+  background: rgba(18, 10, 36, 0.88);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.75), 0 0 25px -5px rgba(147, 51, 234, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.qwen-capsule:focus-within {
+  border-color: rgba(192, 132, 252, 0.65);
+  box-shadow: 0 14px 50px -5px rgba(0, 0, 0, 0.85), 0 0 35px 2px rgba(147, 51, 234, 0.45);
+}
+
+.qwen-dropdown {
+  background: rgba(15, 8, 30, 0.96);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.9), 0 0 30px -5px rgba(147, 51, 234, 0.3);
+}
+
+.sidebar-rail {
+  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+

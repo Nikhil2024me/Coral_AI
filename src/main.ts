@@ -29,10 +29,11 @@ let isAuthenticated = false;
 let conversations: Conversation[] = [];
 let activeConversation: Conversation | null = null;
 let currentMessages: Message[] = [];
+let availableModels: string[] = ['qwen3.5:2b'];
 
 let activeAbortController: AbortController | null = null;
 let isGenerating = false;
-let lastPromptText = '';
+let lastUserPrompt = '';
 
 // Configure marked
 marked.setOptions({
@@ -53,7 +54,7 @@ function escapeHtml(str: string): string {
 // Helper: Format Time
 function formatTime(isoStr?: string): string {
   const date = isoStr ? new Date(isoStr) : new Date();
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 // ==============================================================================
@@ -141,7 +142,7 @@ function syncViewToHash() {
 window.addEventListener('hashchange', syncViewToHash);
 
 // ==============================================================================
-// Notification & Status Messaging (for Login view)
+// Login Handlers
 // ==============================================================================
 function showLoginMessage(text: string, isError = true) {
   let msgEl = document.getElementById('auth-message-banner');
@@ -163,7 +164,7 @@ function showLoginMessage(text: string, isError = true) {
   }
 }
 
-// 1. Google OAuth Click Handler
+// 1. Google OAuth
 const googleBtn = document.querySelector<HTMLButtonElement>('.retro-google-btn');
 if (googleBtn) {
   googleBtn.addEventListener('click', async (e) => {
@@ -198,7 +199,7 @@ if (googleBtn) {
   });
 }
 
-// 2. Email / Password Login Handler
+// 2. Email / Password Login
 const credForm = document.querySelector<HTMLFormElement>('form[data-purpose="credential-form"]');
 if (credForm) {
   credForm.addEventListener('submit', async (e) => {
@@ -271,20 +272,86 @@ if (btnSignOut) {
 }
 
 // ==============================================================================
-// Ollama Diagnostics & Models Management
+// Qwen-Style Model Dropdown Management (Screenshot 3)
 // ==============================================================================
-const ollamaStatusPill = document.getElementById('ollama-status-pill');
+const btnModelTrigger = document.getElementById('btn-model-trigger');
+const modelDropdownMenu = document.getElementById('model-dropdown-menu');
+const modelDropdownItems = document.getElementById('model-dropdown-items');
+const currentModelLabel = document.getElementById('current-model-label');
 const ollamaStatusDot = document.getElementById('ollama-status-dot');
 const ollamaStatusText = document.getElementById('ollama-status-text');
-const chatModelSelect = document.getElementById('chat-model-select') as HTMLSelectElement | null;
-const telemetryModel = document.getElementById('telemetry-model');
-const telemetryHost = document.getElementById('telemetry-host');
+const btnDropdownConfig = document.getElementById('btn-dropdown-config');
+
+function toggleModelDropdown() {
+  modelDropdownMenu?.classList.toggle('hidden');
+}
+
+btnModelTrigger?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  toggleModelDropdown();
+});
+
+btnDropdownConfig?.addEventListener('click', () => {
+  modelDropdownMenu?.classList.add('hidden');
+  openSettingsDialog();
+});
+
+document.addEventListener('click', (e) => {
+  const target = e.target as HTMLElement;
+  if (!target.closest('#model-dropdown-wrapper')) {
+    modelDropdownMenu?.classList.add('hidden');
+  }
+  if (!target.closest('#btn-plus-menu') && !target.closest('#plus-menu-dropdown')) {
+    plusMenuDropdown?.classList.add('hidden');
+  }
+});
+
+function renderModelDropdown() {
+  if (!modelDropdownItems) return;
+  modelDropdownItems.innerHTML = '';
+
+  const activeModel = activeConversation?.model || getOllamaConfig().defaultModel;
+
+  availableModels.forEach((model) => {
+    const isSelected = model === activeModel;
+    const item = document.createElement('div');
+    item.className = `model-option p-2.5 rounded-xl hover:bg-purple-950/60 border ${
+      isSelected ? 'border-purple-500/40 bg-purple-950/40' : 'border-transparent'
+    } cursor-pointer transition-colors`;
+    item.dataset.model = model;
+
+    item.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="font-mono text-xs text-white font-semibold flex items-center gap-1.5">
+          <span>${escapeHtml(model)}</span>
+          ${isSelected ? '<span class="material-symbols-outlined text-sm text-purple-400">check</span>' : ''}
+        </div>
+        <span class="text-[9px] font-mono text-purple-300 uppercase">Local</span>
+      </div>
+      <div class="text-[10px] text-slate-400 font-sans mt-0.5">High-speed inference via local Ollama</div>
+    `;
+
+    item.addEventListener('click', () => {
+      selectModel(model);
+      modelDropdownMenu?.classList.add('hidden');
+    });
+
+    modelDropdownItems.appendChild(item);
+  });
+}
+
+function selectModel(modelName: string) {
+  if (currentModelLabel) currentModelLabel.textContent = modelName;
+  if (activeConversation) {
+    activeConversation.model = modelName;
+  }
+  saveOllamaConfig({ defaultModel: modelName });
+  renderModelDropdown();
+}
 
 async function updateOllamaHealth(customHost?: string) {
   const config = getOllamaConfig();
   const host = customHost || config.host;
-
-  if (telemetryHost) telemetryHost.textContent = host.replace(/^https?:\/\//, '');
 
   if (ollamaStatusText) ollamaStatusText.textContent = 'CONNECTING';
   if (ollamaStatusDot) {
@@ -299,17 +366,14 @@ async function updateOllamaHealth(customHost?: string) {
       ollamaStatusDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
     }
 
-    if (chatModelSelect && models.length > 0) {
-      const currentSelected = chatModelSelect.value || config.defaultModel;
-      chatModelSelect.innerHTML = '';
-      models.forEach((m) => {
-        const opt = document.createElement('option');
-        opt.value = m;
-        opt.textContent = m;
-        if (m === currentSelected) opt.selected = true;
-        chatModelSelect.appendChild(opt);
-      });
-      if (telemetryModel) telemetryModel.textContent = chatModelSelect.value || models[0];
+    if (models.length > 0) {
+      availableModels = models;
+      const current = activeConversation?.model || config.defaultModel;
+      if (!availableModels.includes(current)) {
+        selectModel(availableModels[0]);
+      } else {
+        selectModel(current);
+      }
     }
   } else {
     if (ollamaStatusText) ollamaStatusText.textContent = 'OFFLINE';
@@ -318,213 +382,86 @@ async function updateOllamaHealth(customHost?: string) {
     }
     console.warn('[Coral_AI] Ollama offline or blocked:', error);
   }
+
+  renderModelDropdown();
 }
 
-if (chatModelSelect) {
-  chatModelSelect.addEventListener('change', () => {
-    if (telemetryModel) telemetryModel.textContent = chatModelSelect.value;
-    if (activeConversation) {
-      activeConversation.model = chatModelSelect.value;
+// ==============================================================================
+// Plus Menu Popup (Screenshot 4)
+// ==============================================================================
+const btnPlusMenu = document.getElementById('btn-plus-menu');
+const plusMenuDropdown = document.getElementById('plus-menu-dropdown');
+
+btnPlusMenu?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  plusMenuDropdown?.classList.toggle('hidden');
+});
+
+document.querySelectorAll('.plus-menu-item').forEach((item) => {
+  item.addEventListener('click', () => {
+    const action = (item as HTMLElement).dataset.action;
+    plusMenuDropdown?.classList.add('hidden');
+
+    if (action === 'prompt-sys') {
+      openSettingsDialog();
+      configSystemPrompt?.focus();
+    } else if (action === 'mode-code') {
+      saveOllamaConfig({
+        systemPrompt: 'You are Coral_AI Expert Coder. Provide clean, secure, type-safe, and production-grade code with concise commentary.',
+      });
+      alert('Coder Mode enabled! System directive updated.');
+    } else if (action === 'clear-chat') {
+      startNewSession();
     }
   });
-}
-
-// ==============================================================================
-// Settings Dialog Handlers
-// ==============================================================================
-const settingsModal = document.getElementById('settings-modal');
-const btnOpenSettings = document.getElementById('btn-open-settings');
-const btnCloseSettings = document.getElementById('btn-close-settings');
-const btnCancelSettings = document.getElementById('btn-cancel-settings');
-const btnSaveSettings = document.getElementById('btn-save-settings');
-const btnTestConnection = document.getElementById('btn-test-connection');
-const configHostInput = document.getElementById('config-host-input') as HTMLInputElement | null;
-const configModelInput = document.getElementById('config-model-input') as HTMLInputElement | null;
-const configSystemPrompt = document.getElementById('config-system-prompt') as HTMLTextAreaElement | null;
-const connectionTestResult = document.getElementById('connection-test-result');
-
-function openSettingsDialog() {
-  const config = getOllamaConfig();
-  if (configHostInput) configHostInput.value = config.host;
-  if (configModelInput) configModelInput.value = config.defaultModel;
-  if (configSystemPrompt) configSystemPrompt.value = config.systemPrompt;
-  if (connectionTestResult) connectionTestResult.classList.add('hidden');
-  if (settingsModal) settingsModal.classList.remove('hidden');
-}
-
-function closeSettingsDialog() {
-  if (settingsModal) settingsModal.classList.add('hidden');
-}
-
-btnOpenSettings?.addEventListener('click', openSettingsDialog);
-ollamaStatusPill?.addEventListener('click', openSettingsDialog);
-btnCloseSettings?.addEventListener('click', closeSettingsDialog);
-btnCancelSettings?.addEventListener('click', closeSettingsDialog);
-
-btnTestConnection?.addEventListener('click', async () => {
-  const host = configHostInput?.value?.trim() || 'http://localhost:11434';
-  if (connectionTestResult) {
-    connectionTestResult.classList.remove('hidden');
-    connectionTestResult.className = 'mt-2 text-[11px] p-2.5 rounded-lg bg-purple-950/60 border border-purple-500/30 text-purple-300 font-mono';
-    connectionTestResult.textContent = 'Testing connection...';
-  }
-
-  const { ok, latencyMs, models, error } = await testOllamaConnection(host);
-
-  if (connectionTestResult) {
-    if (ok) {
-      connectionTestResult.className = 'mt-2 text-[11px] p-2.5 rounded-lg bg-emerald-950/50 border border-emerald-500/40 text-emerald-300 font-mono';
-      connectionTestResult.textContent = `Connected! Latency: ${latencyMs}ms | Models found: ${models.join(', ') || 'None'}`;
-    } else {
-      connectionTestResult.className = 'mt-2 text-[11px] p-2.5 rounded-lg bg-rose-950/50 border border-rose-500/40 text-rose-300 font-mono';
-      connectionTestResult.textContent = `Connection failed: ${error || 'Host unreachable'}`;
-    }
-  }
-});
-
-btnSaveSettings?.addEventListener('click', async () => {
-  const host = configHostInput?.value?.trim() || 'http://localhost:11434';
-  const defaultModel = configModelInput?.value?.trim() || 'qwen3.5:2b';
-  const systemPrompt = configSystemPrompt?.value || '';
-
-  saveOllamaConfig({ host, defaultModel, systemPrompt });
-  closeSettingsDialog();
-  await updateOllamaHealth(host);
 });
 
 // ==============================================================================
-// Chat Workspace & Message Rendering
+// Sidebar Interactions (Screenshots 1 & 2)
 // ==============================================================================
-const chatMessagesContainer = document.getElementById('chat-messages-container');
-const chatEmptyState = document.getElementById('chat-empty-state');
-const chatMessageList = document.getElementById('chat-message-list');
-const chatStreamingContainer = document.getElementById('chat-streaming-container');
-const btnStopStream = document.getElementById('btn-stop-stream');
-const chatErrorCard = document.getElementById('chat-error-card');
-const chatErrorText = document.getElementById('chat-error-text');
-const btnRetryPrompt = document.getElementById('btn-retry-prompt');
-const chatPromptForm = document.getElementById('chat-prompt-form') as HTMLFormElement | null;
-const chatPromptInput = document.getElementById('chat-prompt-input') as HTMLTextAreaElement | null;
-const promptCharCount = document.getElementById('prompt-char-count');
-const btnClearPrompt = document.getElementById('btn-clear-prompt');
-
+const chatSidebar = document.getElementById('chat-sidebar');
+const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
 const chatSessionsList = document.getElementById('chat-sessions-list');
 const btnNewSession = document.getElementById('btn-new-session');
-const btnRefreshSessions = document.getElementById('btn-refresh-sessions');
+const btnSearchChats = document.getElementById('btn-search-chats');
 const sessionCountLabel = document.getElementById('session-count-label');
 const storageModeLabel = document.getElementById('storage-mode-label');
-const chatUserEmailBadge = document.getElementById('chat-user-email');
+const sidebarAvatarInitial = document.getElementById('sidebar-avatar-initial');
+const sidebarUserName = document.getElementById('sidebar-user-name');
 
-function renderUserMessageElement(content: string, isoTimestamp?: string): HTMLElement {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'flex justify-end w-full';
-  wrapper.innerHTML = `
-    <div class="max-w-[85%] md:max-w-[75%] rounded-2xl p-4 bg-purple-950/60 border border-purple-500/30 text-slate-100 shadow-md">
-      <div class="flex items-center justify-between gap-4 mb-1.5 text-[10px] font-mono text-purple-300">
-        <span class="font-bold tracking-wider">[USER]</span>
-        <span class="text-slate-400 font-mono">${formatTime(isoTimestamp)}</span>
-      </div>
-      <div class="whitespace-pre-wrap font-sans text-sm leading-relaxed">${escapeHtml(content)}</div>
-    </div>
-  `;
-  return wrapper;
-}
+let isSidebarLockedOpen = false;
 
-function renderAssistantMessageElement(
-  content: string,
-  modelName: string,
-  isoTimestamp?: string,
-  isLiveStreaming = false
-): { container: HTMLElement; contentEl: HTMLElement } {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'flex justify-start w-full';
-
-  const innerCard = document.createElement('div');
-  innerCard.className = 'w-full rounded-2xl p-5 md:p-6 bg-[#0e071e]/90 border border-purple-500/25 text-slate-100 shadow-lg relative overflow-hidden';
-
-  const header = document.createElement('div');
-  header.className = 'flex items-center justify-between gap-4 mb-3 pb-2 border-b border-purple-500/15 text-[10px] font-mono';
-  header.innerHTML = `
-    <div class="flex items-center gap-2">
-      <span class="px-1.5 py-0.5 rounded bg-purple-600 text-white font-pixel text-[9px]">[CORAL_AI]</span>
-      <span class="text-purple-300 tracking-wider font-semibold">${escapeHtml(modelName)}</span>
-    </div>
-    <span class="text-slate-400 font-mono">${formatTime(isoTimestamp)}</span>
-  `;
-
-  const bodyEl = document.createElement('div');
-  bodyEl.className = 'coral-prose text-sm leading-relaxed';
-
-  if (isLiveStreaming) {
-    bodyEl.innerHTML = renderMarkdownWithCodeBlocks(content) + '<span class="inline-block w-2 h-4 bg-purple-400 animate-pulse ml-1 align-middle"></span>';
+btnToggleSidebar?.addEventListener('click', () => {
+  isSidebarLockedOpen = !isSidebarLockedOpen;
+  if (isSidebarLockedOpen) {
+    chatSidebar?.classList.remove('w-16');
+    chatSidebar?.classList.add('w-64');
   } else {
-    bodyEl.innerHTML = renderMarkdownWithCodeBlocks(content);
+    chatSidebar?.classList.remove('w-64');
+    chatSidebar?.classList.add('w-16');
   }
+});
 
-  innerCard.appendChild(header);
-  innerCard.appendChild(bodyEl);
-  wrapper.appendChild(innerCard);
-
-  return { container: wrapper, contentEl: bodyEl };
-}
-
-function scrollChatToBottom() {
-  if (chatMessagesContainer) {
-    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+btnSearchChats?.addEventListener('click', () => {
+  const query = prompt('Enter keyword to search past sessions:');
+  if (query && query.trim()) {
+    const filtered = conversations.filter((c) =>
+      c.title.toLowerCase().includes(query.toLowerCase())
+    );
+    renderFilteredSessions(filtered);
+  } else {
+    renderSidebarSessions();
   }
-}
+});
 
-async function renderConversationMessages() {
-  if (!chatMessageList) return;
-  chatMessageList.innerHTML = '';
-
-  if (currentMessages.length === 0) {
-    if (chatEmptyState) chatEmptyState.classList.remove('hidden');
-    return;
-  }
-
-  if (chatEmptyState) chatEmptyState.classList.add('hidden');
-
-  for (const msg of currentMessages) {
-    if (msg.role === 'user') {
-      const el = renderUserMessageElement(msg.content, msg.created_at);
-      chatMessageList.appendChild(el);
-    } else if (msg.role === 'assistant') {
-      const { container } = renderAssistantMessageElement(
-        msg.content,
-        activeConversation?.model || 'qwen3.5:2b',
-        msg.created_at,
-        false
-      );
-      chatMessageList.appendChild(container);
-    }
-  }
-
-  scrollChatToBottom();
-}
-
-function renderSidebarSessions() {
+function renderFilteredSessions(filteredList: Conversation[]) {
   if (!chatSessionsList) return;
   chatSessionsList.innerHTML = '';
 
-  if (sessionCountLabel) sessionCountLabel.textContent = String(conversations.length);
-  if (storageModeLabel) {
-    storageModeLabel.textContent = getActiveStorageMode() === 'supabase' ? 'CLOUD SYNC' : 'LOCAL STORAGE';
-  }
-
-  if (conversations.length === 0) {
-    chatSessionsList.innerHTML = `
-      <div class="py-6 px-2 text-center text-slate-500 font-mono text-[11px] leading-relaxed">
-        No sessions yet.<br>Click "NEW SESSION" above to start.
-      </div>
-    `;
-    return;
-  }
-
-  conversations.forEach((conv) => {
+  filteredList.forEach((conv) => {
     const isActive = activeConversation?.id === conv.id;
     const item = document.createElement('div');
-    item.className = `session-item group flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all ${
+    item.className = `session-item group flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all ${
       isActive
         ? 'bg-purple-950/70 border border-purple-500/40 text-white font-semibold'
         : 'hover:bg-purple-950/30 border border-transparent text-slate-400 hover:text-slate-200'
@@ -551,6 +488,66 @@ function renderSidebarSessions() {
       await renderConversationMessages();
     });
 
+    chatSessionsList.appendChild(item);
+  });
+}
+
+function renderSidebarSessions() {
+  if (!chatSessionsList) return;
+  chatSessionsList.innerHTML = '';
+
+  if (sessionCountLabel) sessionCountLabel.textContent = String(conversations.length);
+  if (storageModeLabel) {
+    storageModeLabel.textContent = getActiveStorageMode() === 'supabase' ? 'CLOUD SYNC' : 'LOCAL STORAGE';
+  }
+
+  if (sidebarAvatarInitial) {
+    sidebarAvatarInitial.textContent = (currentUserEmail[0] || 'U').toUpperCase();
+  }
+  if (sidebarUserName) {
+    sidebarUserName.textContent = currentUserEmail.split('@')[0] || 'User';
+  }
+
+  if (conversations.length === 0) {
+    chatSessionsList.innerHTML = `
+      <div class="py-6 px-2 text-center text-slate-500 font-mono text-[11px] leading-relaxed whitespace-nowrap">
+        No sessions yet.<br>Click "+ New Chat" to start.
+      </div>
+    `;
+    return;
+  }
+
+  conversations.forEach((conv) => {
+    const isActive = activeConversation?.id === conv.id;
+    const item = document.createElement('div');
+    item.className = `session-item group flex items-center justify-between p-2 rounded-xl cursor-pointer transition-all ${
+      isActive
+        ? 'bg-purple-950/70 border border-purple-500/40 text-white font-semibold'
+        : 'hover:bg-purple-950/30 border border-transparent text-slate-400 hover:text-slate-200'
+    }`;
+    item.dataset.id = conv.id;
+
+    item.innerHTML = `
+      <div class="flex items-center gap-2 truncate pr-1">
+        <span class="material-symbols-outlined text-xs ${isActive ? 'text-purple-300' : 'text-purple-400/60'} shrink-0">chat_bubble</span>
+        <span class="truncate text-xs font-mono">${escapeHtml(conv.title)}</span>
+      </div>
+      <button type="button" class="delete-session-btn p-1 text-slate-500 hover:text-rose-400 rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" data-id="${conv.id}" title="Delete session">
+        <span class="material-symbols-outlined text-sm">delete</span>
+      </button>
+    `;
+
+    item.addEventListener('click', async (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('.delete-session-btn')) return;
+
+      activeConversation = conv;
+      selectModel(conv.model);
+      currentMessages = await listMessages(conv.id, currentUserId);
+      renderSidebarSessions();
+      await renderConversationMessages();
+    });
+
     const deleteBtn = item.querySelector('.delete-session-btn');
     deleteBtn?.addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -559,6 +556,7 @@ function renderSidebarSessions() {
       if (activeConversation?.id === conv.id) {
         activeConversation = conversations[0] || null;
         if (activeConversation) {
+          selectModel(activeConversation.model);
           currentMessages = await listMessages(activeConversation.id, currentUserId);
         } else {
           currentMessages = [];
@@ -577,7 +575,7 @@ async function startNewSession() {
     activeAbortController.abort();
   }
 
-  const model = chatModelSelect?.value || getOllamaConfig().defaultModel;
+  const model = currentModelLabel?.textContent || getOllamaConfig().defaultModel;
   const newConv = await createConversation(currentUserId, 'New Session', model);
   conversations.unshift(newConv);
   activeConversation = newConv;
@@ -589,19 +587,139 @@ async function startNewSession() {
 }
 
 btnNewSession?.addEventListener('click', startNewSession);
-btnRefreshSessions?.addEventListener('click', async () => {
-  conversations = await listConversations(currentUserId);
-  renderSidebarSessions();
+
+// ==============================================================================
+// Chat Message Rendering & Actions (Screenshot 5)
+// ==============================================================================
+const chatMessagesContainer = document.getElementById('chat-messages-container');
+const chatEmptyState = document.getElementById('chat-empty-state');
+const chatMessageList = document.getElementById('chat-message-list');
+const chatStreamingContainer = document.getElementById('chat-streaming-container');
+const btnStopStream = document.getElementById('btn-stop-stream');
+const chatErrorCard = document.getElementById('chat-error-card');
+const chatErrorText = document.getElementById('chat-error-text');
+const btnRetryPrompt = document.getElementById('btn-retry-prompt');
+const chatPromptForm = document.getElementById('chat-prompt-form') as HTMLFormElement | null;
+const chatPromptInput = document.getElementById('chat-prompt-input') as HTMLTextAreaElement | null;
+
+function renderUserMessageElement(content: string): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'flex justify-end w-full';
+  wrapper.innerHTML = `
+    <div class="max-w-[85%] md:max-w-[75%] rounded-3xl px-5 py-3.5 bg-purple-950/50 border border-purple-500/25 text-slate-100 shadow-md">
+      <div class="whitespace-pre-wrap font-sans text-sm leading-relaxed">${escapeHtml(content)}</div>
+    </div>
+  `;
+  return wrapper;
+}
+
+function renderAssistantMessageElement(
+  content: string,
+  modelName: string,
+  isoTimestamp?: string,
+  isLiveStreaming = false
+): { container: HTMLElement; contentEl: HTMLElement } {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'flex justify-start w-full group/msg';
+
+  const innerCard = document.createElement('div');
+  innerCard.className = 'w-full text-slate-100';
+
+  const header = document.createElement('div');
+  header.className = 'flex items-center gap-2 mb-2 text-xs font-mono text-purple-400';
+  header.innerHTML = `
+    <span class="font-pixel text-[9px] px-1.5 py-0.5 rounded bg-purple-950/70 border border-purple-500/40 text-purple-300">${escapeHtml(modelName)}</span>
+    <span class="text-slate-500 text-[10px] font-mono">${formatTime(isoTimestamp)}</span>
+  `;
+
+  const bodyEl = document.createElement('div');
+  bodyEl.className = 'coral-prose text-sm leading-relaxed mb-3';
+
+  if (isLiveStreaming) {
+    bodyEl.innerHTML = renderMarkdownWithCodeBlocks(content) + '<span class="inline-block w-2 h-4 bg-purple-400 animate-pulse ml-1 align-middle"></span>';
+  } else {
+    bodyEl.innerHTML = renderMarkdownWithCodeBlocks(content);
+  }
+
+  // Action Toolbar (Screenshot 5: Copy, Thumbs up/down, Refresh)
+  const actionToolbar = document.createElement('div');
+  actionToolbar.className = 'flex items-center gap-1 text-slate-400 text-xs pt-1.5 border-t border-purple-500/10';
+  actionToolbar.innerHTML = `
+    <button type="button" class="action-btn copy-msg-btn p-1.5 rounded-lg hover:text-purple-300 hover:bg-purple-950/40 transition-colors cursor-pointer" data-text="${encodeURIComponent(content)}" title="Copy message">
+      <span class="material-symbols-outlined text-base">content_copy</span>
+    </button>
+    <button type="button" class="action-btn thumbs-up-btn p-1.5 rounded-lg hover:text-purple-300 hover:bg-purple-950/40 transition-colors cursor-pointer" title="Good response">
+      <span class="material-symbols-outlined text-base">thumb_up</span>
+    </button>
+    <button type="button" class="action-btn thumbs-down-btn p-1.5 rounded-lg hover:text-purple-300 hover:bg-purple-950/40 transition-colors cursor-pointer" title="Bad response">
+      <span class="material-symbols-outlined text-base">thumb_down</span>
+    </button>
+    <button type="button" class="action-btn retry-msg-btn p-1.5 rounded-lg hover:text-purple-300 hover:bg-purple-950/40 transition-colors cursor-pointer" title="Regenerate">
+      <span class="material-symbols-outlined text-base">refresh</span>
+    </button>
+  `;
+
+  innerCard.appendChild(header);
+  innerCard.appendChild(bodyEl);
+  if (!isLiveStreaming && content.trim()) {
+    innerCard.appendChild(actionToolbar);
+  }
+  wrapper.appendChild(innerCard);
+
+  return { container: wrapper, contentEl: bodyEl };
+}
+
+function scrollChatToBottom() {
+  if (chatMessagesContainer) {
+    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+  }
+}
+
+async function renderConversationMessages() {
+  if (!chatMessageList) return;
+  chatMessageList.innerHTML = '';
+
+  if (currentMessages.length === 0) {
+    if (chatEmptyState) chatEmptyState.classList.remove('hidden');
+    return;
+  }
+
+  if (chatEmptyState) chatEmptyState.classList.add('hidden');
+
+  for (const msg of currentMessages) {
+    if (msg.role === 'user') {
+      const el = renderUserMessageElement(msg.content);
+      chatMessageList.appendChild(el);
+    } else if (msg.role === 'assistant') {
+      const { container } = renderAssistantMessageElement(
+        msg.content,
+        activeConversation?.model || 'qwen3.5:2b',
+        msg.created_at,
+        false
+      );
+      chatMessageList.appendChild(container);
+    }
+  }
+
+  scrollChatToBottom();
+}
+
+// Preset starter prompts
+document.querySelectorAll('.starter-prompt-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const prompt = (btn as HTMLElement).dataset.prompt;
+    if (prompt && chatPromptInput) {
+      chatPromptInput.value = prompt;
+      chatPromptForm?.dispatchEvent(new Event('submit', { cancelable: true }));
+    }
+  });
 });
 
-// Prompt input adjustments
+// Auto-expand textarea on typing
 if (chatPromptInput) {
   chatPromptInput.addEventListener('input', () => {
     chatPromptInput.style.height = 'auto';
-    chatPromptInput.style.height = `${Math.min(chatPromptInput.scrollHeight, 180)}px`;
-    if (promptCharCount) {
-      promptCharCount.textContent = `${chatPromptInput.value.length} chars`;
-    }
+    chatPromptInput.style.height = `${Math.min(chatPromptInput.scrollHeight, 140)}px`;
   });
 
   chatPromptInput.addEventListener('keydown', (e) => {
@@ -612,56 +730,69 @@ if (chatPromptInput) {
   });
 }
 
-btnClearPrompt?.addEventListener('click', () => {
-  if (chatPromptInput) {
-    chatPromptInput.value = '';
-    chatPromptInput.style.height = 'auto';
-    if (promptCharCount) promptCharCount.textContent = '0 chars';
-  }
-});
-
-// Preset starter prompts
-document.querySelectorAll('.starter-prompt-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const prompt = (btn as HTMLElement).dataset.prompt;
-    if (prompt && chatPromptInput) {
-      chatPromptInput.value = prompt;
-      chatPromptInput.style.height = 'auto';
-      chatPromptInput.style.height = `${Math.min(chatPromptInput.scrollHeight, 180)}px`;
-      if (promptCharCount) promptCharCount.textContent = `${prompt.length} chars`;
-      chatPromptForm?.dispatchEvent(new Event('submit', { cancelable: true }));
-    }
-  });
-});
-
-// 1-Click Copy Code Event Delegation
+// Message Action Toolbar Event Delegation
 document.addEventListener('click', async (e) => {
-  const target = (e.target as HTMLElement).closest('.copy-code-btn') as HTMLButtonElement | null;
-  if (!target) return;
+  const target = e.target as HTMLElement;
 
-  const rawCode = target.dataset.code;
-  if (!rawCode) return;
+  // 1-Click Copy Code block
+  const copyCodeBtn = target.closest('.copy-code-btn') as HTMLButtonElement | null;
+  if (copyCodeBtn) {
+    const rawCode = copyCodeBtn.dataset.code;
+    if (!rawCode) return;
+    try {
+      await navigator.clipboard.writeText(decodeURIComponent(rawCode));
+      const span = copyCodeBtn.querySelector('span:last-child');
+      const icon = copyCodeBtn.querySelector('.material-symbols-outlined');
+      if (span) span.textContent = 'COPIED';
+      if (icon) icon.textContent = 'check';
+      copyCodeBtn.classList.add('text-emerald-300', 'border-emerald-500/40');
+      setTimeout(() => {
+        if (span) span.textContent = 'COPY';
+        if (icon) icon.textContent = 'content_copy';
+        copyCodeBtn.classList.remove('text-emerald-300', 'border-emerald-500/40');
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy', err);
+    }
+    return;
+  }
 
-  try {
-    const decoded = decodeURIComponent(rawCode);
-    await navigator.clipboard.writeText(decoded);
-    const span = target.querySelector('span:last-child');
-    const icon = target.querySelector('.material-symbols-outlined');
-    if (span) span.textContent = 'COPIED';
-    if (icon) icon.textContent = 'check';
-    target.classList.add('text-emerald-300', 'border-emerald-500/40');
+  // Copy full message
+  const copyMsgBtn = target.closest('.copy-msg-btn') as HTMLButtonElement | null;
+  if (copyMsgBtn) {
+    const text = copyMsgBtn.dataset.text;
+    if (text) {
+      await navigator.clipboard.writeText(decodeURIComponent(text));
+      const icon = copyMsgBtn.querySelector('.material-symbols-outlined');
+      if (icon) icon.textContent = 'check';
+      setTimeout(() => {
+        if (icon) icon.textContent = 'content_copy';
+      }, 1500);
+    }
+    return;
+  }
 
-    setTimeout(() => {
-      if (span) span.textContent = 'COPY';
-      if (icon) icon.textContent = 'content_copy';
-      target.classList.remove('text-emerald-300', 'border-emerald-500/40');
-    }, 2000);
-  } catch (err) {
-    console.error('Failed to copy to clipboard', err);
+  // Thumbs up / down
+  const thumbsUpBtn = target.closest('.thumbs-up-btn');
+  if (thumbsUpBtn) {
+    thumbsUpBtn.classList.toggle('text-purple-400');
+    return;
+  }
+  const thumbsDownBtn = target.closest('.thumbs-down-btn');
+  if (thumbsDownBtn) {
+    thumbsDownBtn.classList.toggle('text-rose-400');
+    return;
+  }
+
+  // Retry / Regenerate
+  const retryBtn = target.closest('.retry-msg-btn');
+  if (retryBtn && lastUserPrompt) {
+    chatPromptInput!.value = lastUserPrompt;
+    chatPromptForm?.dispatchEvent(new Event('submit', { cancelable: true }));
   }
 });
 
-// Submit prompt to Ollama
+// Prompt Submission & Token Streaming
 chatPromptForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (isGenerating) return;
@@ -669,18 +800,17 @@ chatPromptForm?.addEventListener('submit', async (e) => {
   const promptText = chatPromptInput?.value?.trim() || '';
   if (!promptText) return;
 
-  lastPromptText = promptText;
+  lastUserPrompt = promptText;
 
-  // Clear input
+  // Reset input field
   if (chatPromptInput) {
     chatPromptInput.value = '';
     chatPromptInput.style.height = 'auto';
-    if (promptCharCount) promptCharCount.textContent = '0 chars';
   }
 
   // Ensure active conversation
   if (!activeConversation) {
-    const model = chatModelSelect?.value || getOllamaConfig().defaultModel;
+    const model = currentModelLabel?.textContent || getOllamaConfig().defaultModel;
     const title = promptText.slice(0, 36).trim() || 'New Session';
     activeConversation = await createConversation(currentUserId, title, model);
     conversations.unshift(activeConversation);
@@ -699,12 +829,12 @@ chatPromptForm?.addEventListener('submit', async (e) => {
   if (chatEmptyState) chatEmptyState.classList.add('hidden');
   if (chatErrorCard) chatErrorCard.classList.add('hidden');
 
-  const userEl = renderUserMessageElement(promptText, userMsg.created_at);
+  const userEl = renderUserMessageElement(promptText);
   chatMessageList?.appendChild(userEl);
   scrollChatToBottom();
 
   // Prepare streaming assistant response
-  const activeModel = chatModelSelect?.value || activeConversation.model || getOllamaConfig().defaultModel;
+  const activeModel = currentModelLabel?.textContent || activeConversation.model || getOllamaConfig().defaultModel;
   const { container: assistantContainer, contentEl } = renderAssistantMessageElement('', activeModel, undefined, true);
   chatMessageList?.appendChild(assistantContainer);
   scrollChatToBottom();
@@ -743,6 +873,8 @@ chatPromptForm?.addEventListener('submit', async (e) => {
       if (finalContent.trim() && activeConversation) {
         const assistantMsg = await addMessage(activeConversation.id, currentUserId, 'assistant', finalContent);
         currentMessages.push(assistantMsg);
+        // Refresh messages view to mount complete action toolbar
+        await renderConversationMessages();
       }
       scrollChatToBottom();
     },
@@ -751,13 +883,12 @@ chatPromptForm?.addEventListener('submit', async (e) => {
       isGenerating = false;
       activeAbortController = null;
 
-      // Remove the live empty assistant bubble if nothing was generated
       if (!accumulatedContent) {
         assistantContainer.remove();
       }
 
       if (chatErrorCard && chatErrorText) {
-        chatErrorText.textContent = `${err.message} — Verify that Ollama is active on ${config.host} and allows origins (OLLAMA_ORIGINS="*" ollama serve).`;
+        chatErrorText.textContent = `${err.message} — Verify Ollama is running on ${config.host} with OLLAMA_ORIGINS="*".`;
         chatErrorCard.classList.remove('hidden');
       }
       scrollChatToBottom();
@@ -774,26 +905,72 @@ btnStopStream?.addEventListener('click', () => {
 
 // Retry prompt button
 btnRetryPrompt?.addEventListener('click', () => {
-  if (lastPromptText && chatPromptInput) {
-    chatPromptInput.value = lastPromptText;
+  if (lastUserPrompt && chatPromptInput) {
+    chatPromptInput.value = lastUserPrompt;
     chatPromptForm?.dispatchEvent(new Event('submit', { cancelable: true }));
   }
 });
 
-// Mobile sidebar toggle
-const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
-const chatSidebar = document.getElementById('chat-sidebar');
-btnToggleSidebar?.addEventListener('click', () => {
-  if (chatSidebar) {
-    chatSidebar.classList.toggle('-translate-x-full');
+// ==============================================================================
+// Settings Dialog
+// ==============================================================================
+const settingsModal = document.getElementById('settings-modal');
+const btnOpenSettings = document.getElementById('btn-open-settings');
+const btnCloseSettings = document.getElementById('btn-close-settings');
+const btnCancelSettings = document.getElementById('btn-cancel-settings');
+const btnSaveSettings = document.getElementById('btn-save-settings');
+const btnTestConnection = document.getElementById('btn-test-connection');
+const configHostInput = document.getElementById('config-host-input') as HTMLInputElement | null;
+const configModelInput = document.getElementById('config-model-input') as HTMLInputElement | null;
+const configSystemPrompt = document.getElementById('config-system-prompt') as HTMLTextAreaElement | null;
+const connectionTestResult = document.getElementById('connection-test-result');
+
+function openSettingsDialog() {
+  const config = getOllamaConfig();
+  if (configHostInput) configHostInput.value = config.host;
+  if (configModelInput) configModelInput.value = config.defaultModel;
+  if (configSystemPrompt) configSystemPrompt.value = config.systemPrompt;
+  if (connectionTestResult) connectionTestResult.classList.add('hidden');
+  if (settingsModal) settingsModal.classList.remove('hidden');
+}
+
+function closeSettingsDialog() {
+  if (settingsModal) settingsModal.classList.add('hidden');
+}
+
+btnOpenSettings?.addEventListener('click', openSettingsDialog);
+btnCloseSettings?.addEventListener('click', closeSettingsDialog);
+btnCancelSettings?.addEventListener('click', closeSettingsDialog);
+
+btnTestConnection?.addEventListener('click', async () => {
+  const host = configHostInput?.value?.trim() || 'http://localhost:11434';
+  if (connectionTestResult) {
+    connectionTestResult.classList.remove('hidden');
+    connectionTestResult.className = 'mt-2 text-[11px] p-2.5 rounded-lg bg-purple-950/60 border border-purple-500/30 text-purple-300 font-mono';
+    connectionTestResult.textContent = 'Testing connection...';
+  }
+
+  const { ok, latencyMs, models, error } = await testOllamaConnection(host);
+
+  if (connectionTestResult) {
+    if (ok) {
+      connectionTestResult.className = 'mt-2 text-[11px] p-2.5 rounded-lg bg-emerald-950/50 border border-emerald-500/40 text-emerald-300 font-mono';
+      connectionTestResult.textContent = `Connected! Latency: ${latencyMs}ms | Models: ${models.join(', ') || 'None'}`;
+    } else {
+      connectionTestResult.className = 'mt-2 text-[11px] p-2.5 rounded-lg bg-rose-950/50 border border-rose-500/40 text-rose-300 font-mono';
+      connectionTestResult.textContent = `Connection failed: ${error || 'Host unreachable'}`;
+    }
   }
 });
 
-// Close sidebar on message container click on mobile
-chatMessagesContainer?.addEventListener('click', () => {
-  if (window.innerWidth < 768 && chatSidebar && !chatSidebar.classList.contains('-translate-x-full')) {
-    chatSidebar.classList.add('-translate-x-full');
-  }
+btnSaveSettings?.addEventListener('click', async () => {
+  const host = configHostInput?.value?.trim() || 'http://localhost:11434';
+  const defaultModel = configModelInput?.value?.trim() || 'qwen3.5:2b';
+  const systemPrompt = configSystemPrompt?.value || '';
+
+  saveOllamaConfig({ host, defaultModel, systemPrompt });
+  closeSettingsDialog();
+  await updateOllamaHealth(host);
 });
 
 // ==============================================================================
@@ -802,14 +979,13 @@ chatMessagesContainer?.addEventListener('click', () => {
 let isChatInitialized = false;
 
 async function initChatWorkspace() {
-  if (chatUserEmailBadge) chatUserEmailBadge.textContent = currentUserEmail;
-
   if (!isChatInitialized) {
     isChatInitialized = true;
     await updateOllamaHealth();
     conversations = await listConversations(currentUserId);
     if (conversations.length > 0) {
       activeConversation = conversations[0];
+      selectModel(activeConversation.model);
       currentMessages = await listMessages(activeConversation.id, currentUserId);
     } else {
       activeConversation = null;
@@ -820,7 +996,7 @@ async function initChatWorkspace() {
   }
 }
 
-// Inspect Supabase Session on page load
+// Inspect Supabase Session on Load
 supabase.auth.getSession().then(({ data: { session } }) => {
   if (session?.user) {
     isAuthenticated = true;

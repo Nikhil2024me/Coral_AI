@@ -318,226 +318,250 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- VIEW 2: CORAL_AI CHAT WORKSPACE VIEW -->
+  <!-- VIEW 2: CORAL_AI CHAT WORKSPACE (QWEN RETRO LAYOUT) -->
   <!-- ========================================== -->
-  <div id="view-chat" class="hidden flex-col flex-grow w-full h-screen overflow-hidden relative z-20">
-    <!-- Top Navigation Bar -->
-    <header class="h-16 border-b border-purple-500/20 px-4 md:px-6 bg-[#0c061a]/95 backdrop-blur-md flex items-center justify-between shrink-0 z-30">
-      <!-- Left: Mobile Sidebar Toggle + Brand -->
-      <div class="flex items-center gap-3">
-        <button id="btn-toggle-sidebar" class="md:hidden p-1.5 text-slate-300 hover:text-white rounded-lg border border-purple-500/30 bg-purple-950/30" aria-label="Toggle Sessions Sidebar">
-          <span class="material-symbols-outlined text-lg">menu</span>
-        </button>
-        <a href="#/chat" class="flex items-center gap-2 group">
-          <span class="px-1.5 py-0.5 text-[9px] font-pixel bg-purple-600 text-white border border-purple-400">CORAL</span>
-          <span class="text-xs md:text-sm font-pixel text-white tracking-wider">AI_TERMINAL</span>
-        </a>
-      </div>
-
-      <!-- Center: Model Selector & Connection Health -->
-      <div class="flex items-center gap-2 md:gap-3">
-        <div id="ollama-status-pill" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-950/60 border border-purple-500/30 text-[11px] font-mono select-none cursor-pointer" title="Click to view host configuration">
-          <span id="ollama-status-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
-          <span id="ollama-status-text" class="text-slate-300 uppercase tracking-wider">CHECKING</span>
-        </div>
-
-        <div class="relative">
-          <select id="chat-model-select" class="bg-purple-950/70 border border-purple-500/30 text-purple-200 rounded-lg px-2.5 py-1 text-xs font-mono focus:border-purple-400 focus:outline-none appearance-none pr-7 cursor-pointer" title="Select inference model">
-            <option value="qwen3.5:2b">qwen3.5:2b</option>
-          </select>
-          <span class="material-symbols-outlined absolute right-1.5 top-1.5 pointer-events-none text-slate-400 text-base">expand_more</span>
-        </div>
-      </div>
-
-      <!-- Right: User Session, Settings, Logout -->
-      <div class="flex items-center gap-2 md:gap-3">
-        <div id="chat-user-badge" class="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-purple-950/40 border border-purple-500/20 text-xs font-mono text-slate-300">
-          <span class="material-symbols-outlined text-purple-400 text-base">account_circle</span>
-          <span id="chat-user-email" class="truncate max-w-[130px]">user</span>
-        </div>
-
-        <button id="btn-open-settings" class="px-2.5 py-1.5 rounded-lg border border-purple-500/30 bg-purple-950/40 hover:bg-purple-900/50 text-purple-300 hover:text-white text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer" title="Open configuration">
-          <span class="material-symbols-outlined text-sm">settings</span>
-          <span class="hidden sm:inline">CONFIG</span>
-        </button>
-
-        <button id="btn-sign-out" class="px-2.5 py-1.5 rounded-lg border border-rose-500/30 bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 hover:text-rose-100 text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer" title="Sign out of session">
-          <span class="material-symbols-outlined text-sm">logout</span>
-          <span class="hidden sm:inline">EXIT</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- Workspace Main Layout (Sidebar + Chat View) -->
-    <div class="flex-grow flex overflow-hidden relative">
-      <!-- Left Sidebar: Sessions & History -->
-      <aside id="chat-sidebar" class="w-64 md:w-72 bg-[#090514]/95 border-r border-purple-500/20 flex flex-col shrink-0 transition-transform duration-200 z-20 absolute md:static inset-y-0 left-0 -translate-x-full md:translate-x-0">
-        <!-- New Session Action -->
-        <div class="p-3 border-b border-purple-500/15">
-          <button id="btn-new-session" class="btn-pixel-submit w-full py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-pixel text-[11px] tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-purple-900/30">
-            <span class="material-symbols-outlined text-base">add</span>
-            <span>NEW SESSION</span>
+  <div id="view-chat" class="hidden flex-row flex-grow w-full h-screen overflow-hidden relative z-20 bg-[#080511]">
+    
+    <!-- LEFT SIDEBAR (Collapsible between 64px rail & 260px drawer) -->
+    <aside id="chat-sidebar" class="sidebar-rail w-16 md:w-16 hover:md:w-64 group/sidebar bg-[#090514]/95 border-r border-purple-500/20 flex flex-col justify-between shrink-0 z-30 transition-all duration-200 overflow-hidden select-none">
+      
+      <!-- Top Section: Header & Quick Actions -->
+      <div class="flex flex-col w-full">
+        <!-- Logo / Collapse Header -->
+        <div class="h-14 flex items-center justify-between px-3.5 border-b border-purple-500/15">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <!-- Retro Logo Emblem -->
+            <div class="w-8 h-8 rounded-lg bg-purple-600 border border-purple-400 flex items-center justify-center shrink-0">
+              <span class="font-pixel text-[10px] text-white">C</span>
+            </div>
+            <span class="font-pixel text-xs text-white tracking-wider uppercase whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200">Coral_AI</span>
+          </div>
+          <button id="btn-toggle-sidebar" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-purple-900/40 opacity-0 group-hover/sidebar:opacity-100 transition-opacity shrink-0 cursor-pointer" title="Lock/Toggle Sidebar">
+            <span class="material-symbols-outlined text-base">dock_to_left</span>
           </button>
         </div>
 
-        <!-- Sessions List -->
-        <div class="px-3 py-2 flex items-center justify-between text-[10px] font-mono text-purple-300/70 tracking-widest uppercase">
-          <span>PAST SESSIONS</span>
-          <span id="session-count-label">0</span>
-        </div>
-        <div id="chat-sessions-list" class="flex-grow overflow-y-auto px-3 pb-3 space-y-1 font-mono text-xs">
-          <!-- Dynamic session items inserted here -->
-        </div>
-
-        <!-- Sidebar Footer -->
-        <div class="p-3 border-t border-purple-500/15 flex items-center justify-between text-[11px] font-mono text-slate-400 bg-[#070311]">
-          <div class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-xs text-purple-400">dns</span>
-            <span id="storage-mode-label" class="text-slate-300">CLOUD SYNC</span>
-          </div>
-          <button id="btn-refresh-sessions" class="p-1 text-slate-400 hover:text-purple-300 rounded cursor-pointer" title="Refresh session list">
-            <span class="material-symbols-outlined text-sm">refresh</span>
+        <!-- + New Chat Button -->
+        <div class="p-2.5">
+          <button id="btn-new-session" class="w-full h-10 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 border border-purple-500/30 text-purple-200 hover:text-white font-mono text-xs flex items-center px-2.5 gap-3 transition-colors cursor-pointer" title="New Chat">
+            <span class="material-symbols-outlined text-lg shrink-0 text-purple-400">add</span>
+            <span class="font-pixel text-[10px] tracking-wider whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity">NEW CHAT</span>
           </button>
         </div>
-      </aside>
 
-      <!-- Main Chat Thread -->
-      <main class="flex-grow flex flex-col h-full overflow-hidden bg-[#080511] relative">
-        <!-- Messages Scroll Container -->
-        <div id="chat-messages-container" class="flex-grow overflow-y-auto px-4 md:px-8 py-6 space-y-6 scroll-smooth">
-          <!-- Empty State (Shown when no messages) -->
-          <div id="chat-empty-state" class="max-w-3xl mx-auto py-8">
-            <div class="glass-card rounded-2xl p-6 md:p-8 border border-purple-500/30 text-center mb-8 relative overflow-hidden">
-              <div class="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
-              
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950/70 border border-purple-500/40 mb-4 text-[11px] font-mono text-purple-300">
-                <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-                <span>LOCAL INFERENCE ENGINE ACTIVE</span>
-              </div>
+        <!-- Navigation Rail Icons -->
+        <div class="px-2.5 py-1 space-y-1">
+          <!-- Search Chats -->
+          <button id="btn-search-chats" class="w-full h-9 rounded-lg hover:bg-purple-950/40 text-slate-400 hover:text-purple-200 text-xs font-mono flex items-center px-2.5 gap-3 transition-colors cursor-pointer" title="Search Chats">
+            <span class="material-symbols-outlined text-lg shrink-0">search</span>
+            <span class="whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity">Search Chats</span>
+          </button>
 
-              <h2 class="text-lg md:text-xl font-pixel text-white mb-3 tracking-wider uppercase">
-                CORAL_AI NEURAL WORKSPACE
-              </h2>
-              <p class="text-xs md:text-sm text-slate-300 font-sans max-w-xl mx-auto leading-relaxed mb-6">
-                Connected directly to your local Ollama daemon. Private, zero-telemetry machine learning executed on your hardware.
-              </p>
+          <!-- Sessions Library -->
+          <button id="btn-sessions-library" class="w-full h-9 rounded-lg hover:bg-purple-950/40 text-slate-400 hover:text-purple-200 text-xs font-mono flex items-center px-2.5 gap-3 transition-colors cursor-pointer" title="Session History">
+            <span class="material-symbols-outlined text-lg shrink-0">history</span>
+            <span class="whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity">Chat History</span>
+          </button>
+        </div>
 
-              <!-- Telemetry Status Grid -->
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-left max-w-lg mx-auto font-mono text-[11px] p-3 rounded-xl bg-purple-950/30 border border-purple-500/20 mb-6">
-                <div>
-                  <span class="text-slate-500 block uppercase">ENGINE</span>
-                  <span class="text-purple-300 font-semibold">Ollama Local</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block uppercase">ACTIVE MODEL</span>
-                  <span id="telemetry-model" class="text-purple-300 font-semibold truncate block">qwen3.5:2b</span>
-                </div>
-                <div class="col-span-2 sm:col-span-1">
-                  <span class="text-slate-500 block uppercase">ENDPOINT</span>
-                  <span id="telemetry-host" class="text-purple-300 font-semibold truncate block">localhost:11434</span>
-                </div>
-              </div>
+        <!-- Past Sessions List (Visible when expanded) -->
+        <div class="mt-3 px-2.5 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 overflow-hidden">
+          <div class="text-[10px] font-mono text-purple-300/60 uppercase tracking-widest px-2 mb-1.5 flex items-center justify-between">
+            <span>ALL CHATS</span>
+            <span id="session-count-label">0</span>
+          </div>
+          <div id="chat-sessions-list" class="max-h-[calc(100vh-270px)] overflow-y-auto space-y-1 pr-1 font-mono text-xs">
+            <!-- Dynamic session items inserted here -->
+          </div>
+        </div>
+      </div>
 
-              <!-- Quick Starter Prompts -->
-              <p class="text-[11px] font-mono text-slate-400 mb-3 uppercase tracking-wider">COMMAND PRESETS</p>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-left font-mono text-xs">
-                <button class="starter-prompt-btn p-3 rounded-xl border border-purple-500/25 bg-purple-950/20 hover:bg-purple-900/40 hover:border-purple-400/50 text-slate-200 transition-all text-left group cursor-pointer" data-prompt="Design an optimized PostgreSQL schema with composite indexes, explain analyze query plan, and Row Level Security.">
-                  <div class="flex items-center justify-between text-[10px] text-purple-400 mb-1">
-                    <span>[DATABASE_ENGINEERING]</span>
-                    <span class="material-symbols-outlined text-xs group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                  </div>
-                  <div class="text-xs text-slate-300 font-sans line-clamp-2">PostgreSQL schema with composite indexes & RLS</div>
-                </button>
-
-                <button class="starter-prompt-btn p-3 rounded-xl border border-purple-500/25 bg-purple-950/20 hover:bg-purple-900/40 hover:border-purple-400/50 text-slate-200 transition-all text-left group cursor-pointer" data-prompt="Write a production-grade TypeScript debounce and throttle implementation with generics and cancellation handles.">
-                  <div class="flex items-center justify-between text-[10px] text-purple-400 mb-1">
-                    <span>[TYPESCRIPT_ALGO]</span>
-                    <span class="material-symbols-outlined text-xs group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                  </div>
-                  <div class="text-xs text-slate-300 font-sans line-clamp-2">TypeScript debounce & throttle with cancellation</div>
-                </button>
-
-                <button class="starter-prompt-btn p-3 rounded-xl border border-purple-500/25 bg-purple-950/20 hover:bg-purple-900/40 hover:border-purple-400/50 text-slate-200 transition-all text-left group cursor-pointer" data-prompt="Create a production Linux systemd service unit file for an Ollama worker with automatic restart, sandbox hardening, and journal logging.">
-                  <div class="flex items-center justify-between text-[10px] text-purple-400 mb-1">
-                    <span>[LINUX_SYSTEMS]</span>
-                    <span class="material-symbols-outlined text-xs group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                  </div>
-                  <div class="text-xs text-slate-300 font-sans line-clamp-2">Linux systemd unit with hardening & auto-restart</div>
-                </button>
-
-                <button class="starter-prompt-btn p-3 rounded-xl border border-purple-500/25 bg-purple-950/20 hover:bg-purple-900/40 hover:border-purple-400/50 text-slate-200 transition-all text-left group cursor-pointer" data-prompt="Explain the difference between TCP and UDP transmission protocols, packet headers, and reliability guarantees.">
-                  <div class="flex items-center justify-between text-[10px] text-purple-400 mb-1">
-                    <span>[NETWORKING]</span>
-                    <span class="material-symbols-outlined text-xs group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                  </div>
-                  <div class="text-xs text-slate-300 font-sans line-clamp-2">TCP vs UDP protocols, headers & reliability</div>
-                </button>
-              </div>
+      <!-- Bottom Profile & Status -->
+      <div class="p-2.5 border-t border-purple-500/15 flex flex-col gap-2">
+        <div class="flex items-center gap-3 overflow-hidden px-1">
+          <!-- User Avatar -->
+          <div class="w-8 h-8 rounded-full bg-purple-900/60 border border-purple-400/40 flex items-center justify-center shrink-0 text-purple-300 font-pixel text-[10px]">
+            <span id="sidebar-avatar-initial">U</span>
+          </div>
+          <div class="overflow-hidden whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200">
+            <div id="sidebar-user-name" class="font-mono text-xs text-white truncate font-medium">User</div>
+            <div class="flex items-center gap-2">
+              <span id="storage-mode-label" class="text-[9px] font-mono text-purple-400">CLOUD SYNC</span>
+              <button id="btn-sign-out" class="text-[9px] font-mono text-rose-400 hover:text-rose-200 cursor-pointer" title="Exit session">[EXIT]</button>
             </div>
           </div>
+        </div>
+      </div>
+    </aside>
 
-          <!-- Dynamic Chat Message List -->
-          <div id="chat-message-list" class="space-y-6 max-w-4xl mx-auto w-full"></div>
+    <!-- MAIN CHAT CANVAS (Qwen Layout) -->
+    <div class="flex-grow flex flex-col h-full overflow-hidden relative">
+      
+      <!-- Top Bar: Model Selector Dropdown & Quick Actions -->
+      <header class="h-14 px-4 md:px-6 flex items-center justify-between z-20 shrink-0">
+        <!-- Model Selector Pill (Screenshot 3) -->
+        <div class="relative" id="model-dropdown-wrapper">
+          <button id="btn-model-trigger" type="button" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/40 border border-purple-500/30 text-xs font-mono text-purple-200 hover:text-white transition-all cursor-pointer">
+            <span id="ollama-status-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="current-model-label" class="font-pixel text-[10px] text-white tracking-wider">qwen3.5:2b</span>
+            <span class="material-symbols-outlined text-sm text-purple-400">expand_more</span>
+          </button>
 
-          <!-- Streaming Indicator -->
-          <div id="chat-streaming-container" class="hidden max-w-4xl mx-auto w-full">
-            <div class="flex items-center justify-between p-3 rounded-xl bg-purple-950/40 border border-purple-500/30">
-              <div class="flex items-center gap-2 font-mono text-xs text-purple-300">
-                <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
-                <span>STREAMING INFERENCE...</span>
+          <!-- Model Dropdown Menu (Screenshot 3) -->
+          <div id="model-dropdown-menu" class="hidden absolute top-10 left-0 w-80 qwen-dropdown rounded-2xl p-3 z-50">
+            <div class="flex items-center justify-between px-2 pb-2 mb-2 border-b border-purple-500/20 text-[11px] font-mono text-slate-300">
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-purple-300">Active Models</span>
+                <span class="material-symbols-outlined text-xs text-purple-400">info</span>
               </div>
-              <button id="btn-stop-stream" class="px-3 py-1 rounded-lg bg-rose-950/40 border border-rose-500/40 hover:bg-rose-900/50 text-rose-300 text-xs font-mono flex items-center gap-1.5 cursor-pointer">
-                <span class="material-symbols-outlined text-sm">stop_circle</span>
-                <span>STOP</span>
-              </button>
+              <span id="ollama-status-text" class="text-[10px] text-emerald-400">ONLINE</span>
             </div>
-          </div>
 
-          <!-- Error Alert Card -->
-          <div id="chat-error-card" class="hidden max-w-4xl mx-auto w-full p-4 rounded-xl bg-rose-950/30 border border-rose-500/40 text-rose-300 font-mono text-xs">
-            <div class="flex items-start justify-between gap-3">
-              <div class="flex items-start gap-2">
-                <span class="material-symbols-outlined text-rose-400 text-base shrink-0 mt-0.5">error</span>
-                <div>
-                  <div class="font-bold uppercase tracking-wider mb-1">Inference Execution Halted</div>
-                  <p id="chat-error-text" class="text-slate-300 font-sans leading-relaxed"></p>
-                </div>
-              </div>
-              <button id="btn-retry-prompt" class="px-3 py-1.5 rounded-lg bg-rose-900/40 hover:bg-rose-900/70 border border-rose-500/40 text-rose-200 text-xs font-mono shrink-0 cursor-pointer">
-                RETRY
+            <!-- Dynamic Model List -->
+            <div id="model-dropdown-items" class="space-y-1 max-h-60 overflow-y-auto">
+              <!-- Populated dynamically -->
+            </div>
+
+            <div class="pt-2 mt-2 border-t border-purple-500/15 flex items-center justify-between px-2 text-[10px] font-mono">
+              <button id="btn-dropdown-config" type="button" class="text-purple-400 hover:text-purple-200 flex items-center gap-1 cursor-pointer">
+                <span>Configure Host & Models</span>
+                <span class="material-symbols-outlined text-xs">arrow_forward</span>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Input Dock -->
-        <div class="border-t border-purple-500/20 bg-[#0c061a]/95 backdrop-blur-md p-3 md:p-4 shrink-0">
-          <div class="max-w-4xl mx-auto w-full">
-            <form id="chat-prompt-form" class="relative">
-              <div class="rounded-2xl border border-purple-500/30 bg-[#090514]/90 focus-within:border-purple-400 focus-within:ring-2 focus-within:ring-purple-500/20 transition-all p-2.5">
-                <textarea id="chat-prompt-input" rows="2" placeholder="Enter instruction or query (Shift+Enter for newline)..." class="w-full bg-transparent border-0 text-slate-100 placeholder-slate-500 text-sm focus:outline-none resize-none font-sans px-2 py-1 max-h-48"></textarea>
-                
-                <div class="flex items-center justify-between pt-2 border-t border-purple-500/10 mt-1 px-1">
-                  <div class="flex items-center gap-3 text-[11px] font-mono text-slate-500">
-                    <span class="hidden sm:inline">Press Enter to send, Shift+Enter for newline</span>
-                    <span id="prompt-char-count">0 chars</span>
-                  </div>
+        <!-- Top Right Actions -->
+        <div class="flex items-center gap-2">
+          <button id="btn-open-settings" type="button" class="p-2 rounded-xl text-slate-400 hover:text-purple-300 hover:bg-purple-950/40 border border-transparent hover:border-purple-500/30 transition-colors cursor-pointer" title="Settings">
+            <span class="material-symbols-outlined text-lg">settings</span>
+          </button>
+        </div>
+      </header>
 
-                  <div class="flex items-center gap-2">
-                    <button type="button" id="btn-clear-prompt" class="px-2.5 py-1 text-xs font-mono text-slate-400 hover:text-slate-200 rounded border border-transparent hover:border-purple-500/20 transition-colors cursor-pointer" title="Clear input">
-                      CLEAR
-                    </button>
-                    <button type="submit" id="btn-send-prompt" class="btn-pixel-submit px-4 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-pixel text-xs tracking-wider flex items-center gap-1.5 cursor-pointer shadow-md">
-                      <span>SEND</span>
-                      <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </form>
+      <!-- Center Scrollable Workspace -->
+      <div id="chat-messages-container" class="flex-grow overflow-y-auto px-4 md:px-8 pb-32 flex flex-col scroll-smooth">
+        
+        <!-- INITIAL EMPTY STATE (Screenshot 1: Centered Greeting & Input) -->
+        <div id="chat-empty-state" class="flex-grow flex flex-col items-center justify-center min-h-[55vh] max-w-2xl mx-auto w-full text-center px-4">
+          <h1 class="text-2xl md:text-3xl font-pixel text-white mb-8 tracking-wider">
+            How can I help you?
+          </h1>
+
+          <!-- Quick presets grid below greeting -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full font-mono text-xs text-left mb-6">
+            <button class="starter-prompt-btn p-3 rounded-xl border border-purple-500/25 bg-purple-950/20 hover:bg-purple-900/40 hover:border-purple-400/50 text-slate-200 transition-all text-left cursor-pointer" data-prompt="Design an optimized PostgreSQL schema with composite indexes, explain analyze query plan, and Row Level Security.">
+              <div class="text-[10px] text-purple-400 mb-1">[DATABASE]</div>
+              <div class="text-xs text-slate-300 font-sans truncate">PostgreSQL schema & RLS</div>
+            </button>
+            <button class="starter-prompt-btn p-3 rounded-xl border border-purple-500/25 bg-purple-950/20 hover:bg-purple-900/40 hover:border-purple-400/50 text-slate-200 transition-all text-left cursor-pointer" data-prompt="Write a production-grade TypeScript debounce and throttle implementation with generics and cancellation handles.">
+              <div class="text-[10px] text-purple-400 mb-1">[TYPESCRIPT]</div>
+              <div class="text-xs text-slate-300 font-sans truncate">Debounce & throttle with cancellation</div>
+            </button>
           </div>
         </div>
-      </main>
+
+        <!-- ACTIVE CHAT MESSAGES THREAD (Screenshot 5) -->
+        <div id="chat-message-list" class="space-y-6 max-w-3xl mx-auto w-full pt-4"></div>
+
+        <!-- Streaming Indicator -->
+        <div id="chat-streaming-container" class="hidden max-w-3xl mx-auto w-full mt-4">
+          <div class="flex items-center justify-between p-3 rounded-xl bg-purple-950/40 border border-purple-500/30">
+            <div class="flex items-center gap-2 font-mono text-xs text-purple-300">
+              <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+              <span>GENERATING RESPONSE...</span>
+            </div>
+            <button id="btn-stop-stream" class="px-3 py-1 rounded-lg bg-rose-950/40 border border-rose-500/40 hover:bg-rose-900/50 text-rose-300 text-xs font-mono flex items-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-sm">stop_circle</span>
+              <span>STOP</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Error Card -->
+        <div id="chat-error-card" class="hidden max-w-3xl mx-auto w-full mt-4 p-4 rounded-xl bg-rose-950/30 border border-rose-500/40 text-rose-300 font-mono text-xs">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-2">
+              <span class="material-symbols-outlined text-rose-400 text-base shrink-0 mt-0.5">error</span>
+              <div>
+                <div class="font-bold uppercase tracking-wider mb-1">Execution Interrupted</div>
+                <p id="chat-error-text" class="text-slate-300 font-sans leading-relaxed"></p>
+              </div>
+            </div>
+            <button id="btn-retry-prompt" class="px-3 py-1.5 rounded-lg bg-rose-900/40 hover:bg-rose-900/70 border border-rose-500/40 text-rose-200 text-xs font-mono shrink-0 cursor-pointer">
+              RETRY
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FLOATING CAPSULE INPUT DOCK (Screenshots 1, 4, 5) -->
+      <div class="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-[#080511] via-[#080511]/90 to-transparent pointer-events-none z-30">
+        <div class="max-w-3xl mx-auto w-full pointer-events-auto">
+          
+          <!-- The Rounded Capsule Bar -->
+          <form id="chat-prompt-form" class="relative qwen-capsule rounded-full md:rounded-3xl p-2 md:p-2.5 flex items-center gap-2">
+            
+            <!-- Left Plus Button (Opens Feature Menu - Screenshot 4) -->
+            <div class="relative">
+              <button id="btn-plus-menu" type="button" class="w-9 h-9 rounded-full bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/30 text-purple-300 hover:text-white flex items-center justify-center shrink-0 transition-colors cursor-pointer" title="Options & Modes">
+                <span class="material-symbols-outlined text-lg">add</span>
+              </button>
+
+              <!-- Plus Menu Popup (Screenshot 4) -->
+              <div id="plus-menu-dropdown" class="hidden absolute bottom-12 left-0 w-64 qwen-dropdown rounded-2xl p-2 z-50 text-xs font-mono">
+                <button type="button" class="plus-menu-item w-full p-2.5 rounded-xl hover:bg-purple-950/50 text-slate-200 flex items-center gap-2.5 text-left transition-colors cursor-pointer" data-action="prompt-sys">
+                  <span class="material-symbols-outlined text-base text-purple-400">tune</span>
+                  <div>
+                    <div class="font-bold text-white text-[11px]">System Directive</div>
+                    <div class="text-[10px] text-slate-400 font-sans">Set assistant persona</div>
+                  </div>
+                </button>
+                <button type="button" class="plus-menu-item w-full p-2.5 rounded-xl hover:bg-purple-950/50 text-slate-200 flex items-center gap-2.5 text-left transition-colors cursor-pointer" data-action="mode-code">
+                  <span class="material-symbols-outlined text-base text-purple-400">code</span>
+                  <div>
+                    <div class="font-bold text-white text-[11px]">Coder Mode</div>
+                    <div class="text-[10px] text-slate-400 font-sans">Focus on syntax & refactoring</div>
+                  </div>
+                </button>
+                <button type="button" class="plus-menu-item w-full p-2.5 rounded-xl hover:bg-purple-950/50 text-slate-200 flex items-center gap-2.5 text-left transition-colors cursor-pointer" data-action="clear-chat">
+                  <span class="material-symbols-outlined text-base text-rose-400">delete_sweep</span>
+                  <div>
+                    <div class="font-bold text-rose-300 text-[11px]">Clear Session</div>
+                    <div class="text-[10px] text-slate-400 font-sans">Reset conversation context</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Text Input / Auto-expanding Textarea -->
+            <textarea id="chat-prompt-input" rows="1" placeholder="Ask Coral_AI..." class="flex-grow bg-transparent border-0 text-slate-100 placeholder-slate-500 text-sm focus:outline-none resize-none font-sans px-2.5 py-1.5 max-h-36 leading-relaxed"></textarea>
+
+            <!-- Right Controls: Speed Pill & Send Button -->
+            <div class="flex items-center gap-2 shrink-0 pr-1">
+              <!-- Inference Mode Badge -->
+              <div class="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-950/50 border border-purple-500/20 text-purple-300 text-[11px] font-mono select-none">
+                <span>Fast</span>
+              </div>
+
+              <!-- Send Button (Circle Up Arrow) -->
+              <button id="btn-send-prompt" type="submit" class="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-500 active:scale-95 text-white flex items-center justify-center shrink-0 transition-all cursor-pointer shadow-lg shadow-purple-900/40">
+                <span class="material-symbols-outlined text-lg leading-none">arrow_upward</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Subtle Footer Disclaimer (Screenshot 5) -->
+          <div class="text-center mt-2">
+            <span class="text-[10px] font-sans text-slate-500">
+              Coral_AI local inference • Generated by your local Ollama daemon
+            </span>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   </div>
 
