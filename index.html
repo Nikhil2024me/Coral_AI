@@ -169,7 +169,7 @@
     }
   </style>
 </head>
-<body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col justify-between font-sans selection:bg-purple-600 selection:text-white relative overflow-x-hidden antialiased">
+<body class="bg-brand-dark text-slate-100 h-screen w-screen flex flex-col font-sans selection:bg-purple-600 selection:text-white relative overflow-hidden antialiased">
   <!-- Animated Dynamic Background Layer with Coral_AI Pattern -->
   <div class="fixed inset-0 pointer-events-none -z-20 overflow-hidden bg-brand-dark">
     <div class="animated-coral-bg absolute inset-0 w-full h-full opacity-35 mix-blend-screen scale-105"></div>
@@ -186,7 +186,7 @@
   <!-- ========================================== -->
   <!-- VIEW 1: AUTHENTICATION / LOGIN VIEW -->
   <!-- ========================================== -->
-  <div id="view-login" class="flex flex-col justify-between flex-grow w-full relative z-20">
+  <div id="view-login" class="flex flex-col justify-between flex-grow w-full h-full overflow-y-auto relative z-20">
     <!-- Header -->
     <header class="w-full max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between z-30" data-purpose="modern-header">
       <a class="flex items-center space-x-3 group" href="#/">
@@ -320,52 +320,51 @@
   <!-- ========================================== -->
   <!-- VIEW 2: CORAL_AI CHAT WORKSPACE (QWEN RETRO LAYOUT) -->
   <!-- ========================================== -->
-  <div id="view-chat" class="hidden flex-row flex-grow w-full h-screen overflow-hidden relative z-20 bg-[#080511]">
+  <div id="view-chat" class="hidden flex flex-row flex-grow w-full h-full overflow-hidden relative z-20 bg-[#080511]">
     
     <!-- LEFT SIDEBAR (Collapsible between 64px rail & 260px drawer) -->
-    <aside id="chat-sidebar" class="sidebar-rail w-16 md:w-16 hover:md:w-64 group/sidebar bg-[#090514]/95 border-r border-purple-500/20 flex flex-col justify-between shrink-0 z-30 transition-all duration-200 overflow-hidden select-none">
+    <aside id="chat-sidebar" class="sidebar-rail w-16 md:w-16 hover:md:w-64 group/sidebar bg-[#090514]/95 border-r border-purple-500/20 flex flex-col justify-between shrink-0 h-full z-30 transition-all duration-200 overflow-hidden select-none">
       
       <!-- Top Section: Header & Quick Actions -->
       <div class="flex flex-col w-full">
         <!-- Logo / Collapse Header -->
-        <div class="h-14 flex items-center justify-between px-3.5 border-b border-purple-500/15">
-          <div class="flex items-center gap-3 overflow-hidden">
-            <!-- Retro Logo Emblem -->
-            <div class="w-8 h-8 rounded-lg bg-purple-600 border border-purple-400 flex items-center justify-center shrink-0">
-              <span class="font-pixel text-[10px] text-white">C</span>
+        <div class="h-14 flex items-center justify-between px-3 border-b border-purple-500/15 shrink-0">
+          <div class="hidden group-hover/sidebar:flex items-center gap-2.5 overflow-hidden">
+            <div class="w-7 h-7 rounded-lg bg-purple-600 border border-purple-400 flex items-center justify-center shrink-0">
+              <span class="font-pixel text-[9px] text-white">C</span>
             </div>
-            <span class="font-pixel text-xs text-white tracking-wider uppercase whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200">Coral_AI</span>
+            <span class="font-pixel text-xs text-white tracking-wider uppercase whitespace-nowrap">Coral_AI</span>
           </div>
-          <button id="btn-toggle-sidebar" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-purple-900/40 opacity-0 group-hover/sidebar:opacity-100 transition-opacity shrink-0 cursor-pointer" title="Lock/Toggle Sidebar">
-            <span class="material-symbols-outlined text-base">dock_to_left</span>
+          <button id="btn-toggle-sidebar" class="w-10 h-10 rounded-xl hover:bg-purple-950/50 text-slate-400 hover:text-white flex items-center justify-center shrink-0 mx-auto group-hover/sidebar:mx-0 transition-colors cursor-pointer" title="Toggle Sidebar">
+            <span class="material-symbols-outlined text-lg">dock_to_left</span>
           </button>
         </div>
 
         <!-- + New Chat Button -->
-        <div class="p-2.5">
-          <button id="btn-new-session" class="w-full h-10 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 border border-purple-500/30 text-purple-200 hover:text-white font-mono text-xs flex items-center px-2.5 gap-3 transition-colors cursor-pointer" title="New Chat">
+        <div class="p-2">
+          <button id="btn-new-session" class="w-full h-10 rounded-xl bg-purple-950/50 hover:bg-purple-900/60 border border-purple-500/30 text-purple-200 hover:text-white flex items-center justify-center group-hover/sidebar:justify-start px-2.5 gap-3 transition-colors cursor-pointer" title="New Chat">
             <span class="material-symbols-outlined text-lg shrink-0 text-purple-400">add</span>
-            <span class="font-pixel text-[10px] tracking-wider whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity">NEW CHAT</span>
+            <span class="font-pixel text-[10px] tracking-wider whitespace-nowrap hidden group-hover/sidebar:inline">NEW CHAT</span>
           </button>
         </div>
 
         <!-- Navigation Rail Icons -->
-        <div class="px-2.5 py-1 space-y-1">
+        <div class="px-2 py-1 space-y-1">
           <!-- Search Chats -->
-          <button id="btn-search-chats" class="w-full h-9 rounded-lg hover:bg-purple-950/40 text-slate-400 hover:text-purple-200 text-xs font-mono flex items-center px-2.5 gap-3 transition-colors cursor-pointer" title="Search Chats">
+          <button id="btn-search-chats" class="w-full h-10 rounded-xl hover:bg-purple-950/50 text-slate-400 hover:text-purple-200 flex items-center justify-center group-hover/sidebar:justify-start px-2.5 gap-3 transition-colors cursor-pointer" title="Search Chats">
             <span class="material-symbols-outlined text-lg shrink-0">search</span>
-            <span class="whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity">Search Chats</span>
+            <span class="whitespace-nowrap hidden group-hover/sidebar:inline text-xs font-mono">Search Chats</span>
           </button>
 
           <!-- Sessions Library -->
-          <button id="btn-sessions-library" class="w-full h-9 rounded-lg hover:bg-purple-950/40 text-slate-400 hover:text-purple-200 text-xs font-mono flex items-center px-2.5 gap-3 transition-colors cursor-pointer" title="Session History">
+          <button id="btn-sessions-library" class="w-full h-10 rounded-xl hover:bg-purple-950/50 text-slate-400 hover:text-purple-200 flex items-center justify-center group-hover/sidebar:justify-start px-2.5 gap-3 transition-colors cursor-pointer" title="Chat History">
             <span class="material-symbols-outlined text-lg shrink-0">history</span>
-            <span class="whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity">Chat History</span>
+            <span class="whitespace-nowrap hidden group-hover/sidebar:inline text-xs font-mono">Chat History</span>
           </button>
         </div>
 
         <!-- Past Sessions List (Visible when expanded) -->
-        <div class="mt-3 px-2.5 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 overflow-hidden">
+        <div class="mt-2 px-2 hidden group-hover/sidebar:block transition-all duration-200 overflow-hidden">
           <div class="text-[10px] font-mono text-purple-300/60 uppercase tracking-widest px-2 mb-1.5 flex items-center justify-between">
             <span>ALL CHATS</span>
             <span id="session-count-label">0</span>
@@ -377,18 +376,15 @@
       </div>
 
       <!-- Bottom Profile & Status -->
-      <div class="p-2.5 border-t border-purple-500/15 flex flex-col gap-2">
-        <div class="flex items-center gap-3 overflow-hidden px-1">
-          <!-- User Avatar -->
-          <div class="w-8 h-8 rounded-full bg-purple-900/60 border border-purple-400/40 flex items-center justify-center shrink-0 text-purple-300 font-pixel text-[10px]">
-            <span id="sidebar-avatar-initial">U</span>
-          </div>
-          <div class="overflow-hidden whitespace-nowrap opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200">
-            <div id="sidebar-user-name" class="font-mono text-xs text-white truncate font-medium">User</div>
-            <div class="flex items-center gap-2">
-              <span id="storage-mode-label" class="text-[9px] font-mono text-purple-400">CLOUD SYNC</span>
-              <button id="btn-sign-out" class="text-[9px] font-mono text-rose-400 hover:text-rose-200 cursor-pointer" title="Exit session">[EXIT]</button>
-            </div>
+      <div class="p-2 border-t border-purple-500/15 flex items-center justify-center group-hover/sidebar:justify-start gap-2.5">
+        <div class="w-9 h-9 rounded-full bg-purple-900/70 border border-purple-400/40 flex items-center justify-center shrink-0 text-purple-300 font-pixel text-[11px]">
+          <span id="sidebar-avatar-initial">U</span>
+        </div>
+        <div class="hidden group-hover/sidebar:flex flex-col overflow-hidden whitespace-nowrap">
+          <div id="sidebar-user-name" class="font-mono text-xs text-white truncate font-medium">User</div>
+          <div class="flex items-center gap-2">
+            <span id="storage-mode-label" class="text-[9px] font-mono text-purple-400">CLOUD SYNC</span>
+            <button id="btn-sign-out" class="text-[9px] font-mono text-rose-400 hover:text-rose-200 cursor-pointer" title="Exit session">[EXIT]</button>
           </div>
         </div>
       </div>
